@@ -3,146 +3,371 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#0a0e27">
-    <title>ESP32 BLE Monitor</title>
+    <meta name="theme-color" content="#0f172a">
+    <title>Rep Tracker - Musculation Connectée</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
+        :root {
+            /* Colors - Sport/Performance theme */
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --accent-primary: #22c55e;
+            --accent-secondary: #ef4444;
+            --accent-warning: #f59e0b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border-color: #475569;
+        }
+        
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #0a0e27 0%, #151a35 100%);
-            color: #e8edf4;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: var(--text-primary);
             min-height: 100vh;
-            padding: 20px;
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
         }
         
         .container {
             max-width: 500px;
             margin: 0 auto;
+            padding: 16px;
         }
         
+        /* Header */
         .header {
-            background: #151a35;
-            border: 1px solid #2a3254;
-            border-radius: 12px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
             padding: 20px;
-            margin-bottom: 20px;
-            text-align: center;
+            margin-bottom: 16px;
+        }
+        
+        .app-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: linear-gradient(90deg, var(--accent-primary), #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 12px;
         }
         
         .status {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            padding: 8px 16px;
-            background: #1e2544;
+            padding: 6px 12px;
+            background: var(--bg-tertiary);
             border-radius: 20px;
-            font-size: 14px;
-            margin-top: 10px;
+            font-size: 13px;
         }
         
         .status-dot {
             width: 8px;
             height: 8px;
             border-radius: 50%;
-            background: #4a5578;
+            background: var(--accent-secondary);
         }
         
         .status.connected .status-dot {
-            background: #10b981;
-            box-shadow: 0 0 8px #10b981;
+            background: var(--accent-primary);
+            box-shadow: 0 0 8px var(--accent-primary);
+            animation: pulse-dot 2s infinite;
         }
         
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        /* Buttons */
         .btn {
             width: 100%;
-            padding: 16px;
-            background: linear-gradient(135deg, #00d9ff, #7c3aed);
-            color: white;
+            min-height: 48px;
+            padding: 14px 20px;
             border: none;
             border-radius: 12px;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            margin: 10px 0;
+            transition: all 0.2s;
+            touch-action: manipulation;
         }
         
-        .btn:active {
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-primary), #16a34a);
+            color: white;
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+        }
+        
+        .btn-primary:active {
             transform: scale(0.98);
         }
         
-        .btn-disconnect {
-            background: #ef4444;
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
         }
         
-        .data-section {
-            background: #151a35;
-            border: 1px solid #2a3254;
+        .btn-danger {
+            background: var(--accent-secondary);
+            color: white;
+        }
+        
+        .btn-warning {
+            background: var(--accent-warning);
+            color: white;
+        }
+        
+        /* Exercise Selection */
+        .exercise-select {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
             border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
+            padding: 16px;
+            margin-bottom: 16px;
         }
         
-        .section-title {
+        .exercise-select label {
+            display: block;
             font-size: 14px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #2a3254;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
         }
         
-        .data-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 10px;
-        }
-        
-        .data-card {
-            background: #1e2544;
-            border: 1px solid #2a3254;
+        .exercise-select select {
+            width: 100%;
+            padding: 12px;
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
             border-radius: 8px;
-            padding: 15px;
+            font-size: 16px;
         }
         
-        .data-label {
-            font-size: 12px;
-            color: #8b95b0;
-            text-transform: uppercase;
-            margin-bottom: 5px;
+        /* Rep Counter - Main Display */
+        .rep-counter {
+            background: var(--bg-secondary);
+            border: 2px solid var(--accent-primary);
+            border-radius: 20px;
+            padding: 32px;
+            margin-bottom: 16px;
+            text-align: center;
         }
         
-        .data-value {
-            font-size: 24px;
-            font-weight: 700;
-            color: #00d9ff;
-        }
-        
-        .data-unit {
+        .rep-label {
             font-size: 14px;
-            color: #4a5578;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+        
+        .rep-count {
+            font-size: 72px;
+            font-weight: 700;
+            color: var(--accent-primary);
+            line-height: 1;
+            margin-bottom: 16px;
+            font-variant-numeric: tabular-nums;
+        }
+        
+        .rep-status {
+            font-size: 16px;
+            color: var(--text-secondary);
+        }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .stat-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+        
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+            font-variant-numeric: tabular-nums;
+        }
+        
+        .stat-unit {
+            font-size: 14px;
+            color: var(--text-secondary);
             margin-left: 4px;
         }
         
-        .hidden {
-            display: none;
+        /* Velocity Bar */
+        .velocity-bar {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
         }
         
+        .velocity-label {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+        }
+        
+        .velocity-track {
+            height: 12px;
+            background: var(--bg-tertiary);
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .velocity-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-secondary), var(--accent-warning), var(--accent-primary));
+            border-radius: 6px;
+            transition: width 0.3s ease;
+        }
+        
+        /* Quality Indicator */
+        .quality-indicator {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .quality-label {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--text-secondary);
+        }
+        
+        .quality-badges {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .quality-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .quality-badge.good {
+            background: rgba(34, 197, 94, 0.2);
+            color: var(--accent-primary);
+        }
+        
+        .quality-badge.warning {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--accent-warning);
+        }
+        
+        .quality-badge.bad {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--accent-secondary);
+        }
+        
+        /* History */
+        .history {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .history-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--text-secondary);
+        }
+        
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .history-reps {
+            font-weight: 700;
+            color: var(--accent-primary);
+        }
+        
+        /* Advice Panel */
+        .advice-panel {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(59, 130, 246, 0.1));
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .advice-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        
+        .advice-text {
+            font-size: 14px;
+            line-height: 1.5;
+            color: var(--text-primary);
+        }
+        
+        /* Toast */
         .toast {
             position: fixed;
             top: 20px;
-            right: 20px;
-            left: 20px;
+            left: 16px;
+            right: 16px;
             max-width: 400px;
             margin: 0 auto;
-            padding: 15px 20px;
-            background: #151a35;
-            border: 1px solid #2a3254;
-            border-left: 4px solid #00d9ff;
-            border-radius: 8px;
+            padding: 16px 20px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--accent-primary);
+            border-radius: 12px;
             color: white;
             transform: translateY(-200px);
             transition: transform 0.3s;
             z-index: 1000;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
         }
         
         .toast.show {
@@ -150,109 +375,211 @@
         }
         
         .toast.error {
-            border-left-color: #ef4444;
+            border-left-color: var(--accent-secondary);
+        }
+        
+        .toast.warning {
+            border-left-color: var(--accent-warning);
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        /* Animations */
+        @keyframes rep-flash {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .rep-flash {
+            animation: rep-flash 0.3s ease;
         }
     </style>
 </head>
 <body>
     <div class="container">
+        <!-- Header -->
         <div class="header">
-            <h1>ESP32 BLE Monitor</h1>
-            <div class="status" id="status">
-                <span class="status-dot"></span>
-                <span id="statusText">Déconnecté</span>
+            <h1 class="app-title">💪 Rep Tracker</h1>
+            <div class="status-row">
+                <div class="status" id="status">
+                    <span class="status-dot"></span>
+                    <span id="statusText">Déconnecté</span>
+                </div>
             </div>
         </div>
         
+        <!-- Connect Section -->
         <div id="connectSection">
-            <button class="btn" id="connectBtn">Connecter ESP32</button>
+            <button class="btn btn-primary" id="connectBtn">
+                Connecter le capteur
+            </button>
         </div>
         
+        <!-- Connected Section -->
         <div id="connectedSection" class="hidden">
-            <div class="data-section">
-                <div class="section-title">Device</div>
-                <p id="deviceName">—</p>
+            <!-- Exercise Selection -->
+            <div class="exercise-select">
+                <label for="exerciseType">Type d'exercice</label>
+                <select id="exerciseType">
+                    <option value="squat">Squat</option>
+                    <option value="bench">Développé couché</option>
+                    <option value="deadlift">Soulevé de terre</option>
+                    <option value="row">Rowing</option>
+                    <option value="curl">Curl biceps</option>
+                    <option value="press">Développé militaire</option>
+                </select>
             </div>
-            <button class="btn btn-disconnect" id="disconnectBtn">Déconnecter</button>
-        </div>
-        
-        <div class="data-section">
-            <div class="section-title">Accéléromètre</div>
-            <div class="data-grid">
-                <div class="data-card">
-                    <div class="data-label">Axe X</div>
-                    <div class="data-value"><span id="ax">0.00</span><span class="data-unit">g</span></div>
+            
+            <!-- Rep Counter -->
+            <div class="rep-counter">
+                <div class="rep-label">Répétitions</div>
+                <div class="rep-count" id="repCount">0</div>
+                <div class="rep-status" id="repStatus">En attente...</div>
+            </div>
+            
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Vitesse moy.</div>
+                    <div class="stat-value">
+                        <span id="avgVelocity">0</span>
+                        <span class="stat-unit">m/s</span>
+                    </div>
                 </div>
-                <div class="data-card">
-                    <div class="data-label">Axe Y</div>
-                    <div class="data-value"><span id="ay">0.00</span><span class="data-unit">g</span></div>
+                <div class="stat-card">
+                    <div class="stat-label">ROM</div>
+                    <div class="stat-value">
+                        <span id="romValue">0</span>
+                        <span class="stat-unit">%</span>
+                    </div>
                 </div>
-                <div class="data-card">
-                    <div class="data-label">Axe Z</div>
-                    <div class="data-value"><span id="az">0.00</span><span class="data-unit">g</span></div>
+                <div class="stat-card">
+                    <div class="stat-label">Tempo</div>
+                    <div class="stat-value">
+                        <span id="tempoValue">0</span>
+                        <span class="stat-unit">s</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Fatigue</div>
+                    <div class="stat-value">
+                        <span id="fatigueValue">0</span>
+                        <span class="stat-unit">%</span>
+                    </div>
                 </div>
             </div>
-        </div>
-        
-        <div class="data-section">
-            <div class="section-title">Gyroscope</div>
-            <div class="data-grid">
-                <div class="data-card">
-                    <div class="data-label">Rotation X</div>
-                    <div class="data-value"><span id="gx">0.00</span><span class="data-unit">°/s</span></div>
-                </div>
-                <div class="data-card">
-                    <div class="data-label">Rotation Y</div>
-                    <div class="data-value"><span id="gy">0.00</span><span class="data-unit">°/s</span></div>
-                </div>
-                <div class="data-card">
-                    <div class="data-label">Rotation Z</div>
-                    <div class="data-value"><span id="gz">0.00</span><span class="data-unit">°/s</span></div>
+            
+            <!-- Velocity Bar -->
+            <div class="velocity-bar">
+                <div class="velocity-label">Vélocité en temps réel</div>
+                <div class="velocity-track">
+                    <div class="velocity-fill" id="velocityFill" style="width: 0%"></div>
                 </div>
             </div>
-        </div>
-        
-        <div class="data-section">
-            <div class="section-title">Température</div>
-            <div class="data-card">
-                <div class="data-value"><span id="temp">--</span><span class="data-unit">°C</span></div>
+            
+            <!-- Quality Indicator -->
+            <div class="quality-indicator">
+                <div class="quality-label">Qualité du mouvement</div>
+                <div class="quality-badges" id="qualityBadges">
+                    <div class="quality-badge good">En attente</div>
+                </div>
             </div>
+            
+            <!-- Advice Panel -->
+            <div class="advice-panel" id="advicePanel">
+                <div class="advice-icon">💡</div>
+                <div class="advice-text" id="adviceText">
+                    Commencez votre série. Le capteur détectera automatiquement vos répétitions.
+                </div>
+            </div>
+            
+            <!-- History -->
+            <div class="history">
+                <div class="history-title">Historique de la série</div>
+                <div id="historyList">
+                    <div style="text-align: center; color: var(--text-secondary); padding: 20px;">
+                        Aucune répétition enregistrée
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Control Buttons -->
+            <button class="btn btn-warning" id="resetBtn" style="margin-bottom: 8px;">
+                Nouvelle série
+            </button>
+            <button class="btn btn-danger" id="disconnectBtn">
+                Déconnecter
+            </button>
         </div>
     </div>
     
     <div class="toast" id="toast"></div>
     
     <script>
+        // Configuration BLE
         const BLE_SERVICE_UUID = '4fafc201-1fb5-459e-8fcc-c5c9c331914b';
         const BLE_CHARACTERISTIC_UUID = 'beb5483e-36e1-4688-b7f5-ea07361b26a8';
         
+        // État global
         let device = null;
         let characteristic = null;
+        let repCount = 0;
+        let isTracking = false;
+        let repHistory = [];
         
+        // Détection de répétitions
+        let previousZ = 1.0;
+        let peakZ = 1.0;
+        let valleyZ = 1.0;
+        let movementPhase = 'neutral'; // neutral, up, down
+        let repStartTime = 0;
+        let velocities = [];
+        let currentROM = 0;
+        
+        // Seuils configurables par exercice
+        const exerciseThresholds = {
+            squat: { threshold: 0.3, minROM: 0.5 },
+            bench: { threshold: 0.25, minROM: 0.4 },
+            deadlift: { threshold: 0.35, minROM: 0.6 },
+            row: { threshold: 0.2, minROM: 0.3 },
+            curl: { threshold: 0.15, minROM: 0.4 },
+            press: { threshold: 0.25, minROM: 0.45 }
+        };
+        
+        // Éléments DOM
         const elements = {
             connectBtn: document.getElementById('connectBtn'),
             disconnectBtn: document.getElementById('disconnectBtn'),
+            resetBtn: document.getElementById('resetBtn'),
             status: document.getElementById('status'),
             statusText: document.getElementById('statusText'),
-            deviceName: document.getElementById('deviceName'),
             connectSection: document.getElementById('connectSection'),
             connectedSection: document.getElementById('connectedSection'),
-            toast: document.getElementById('toast'),
-            ax: document.getElementById('ax'),
-            ay: document.getElementById('ay'),
-            az: document.getElementById('az'),
-            gx: document.getElementById('gx'),
-            gy: document.getElementById('gy'),
-            gz: document.getElementById('gz'),
-            temp: document.getElementById('temp')
+            repCount: document.getElementById('repCount'),
+            repStatus: document.getElementById('repStatus'),
+            avgVelocity: document.getElementById('avgVelocity'),
+            romValue: document.getElementById('romValue'),
+            tempoValue: document.getElementById('tempoValue'),
+            fatigueValue: document.getElementById('fatigueValue'),
+            velocityFill: document.getElementById('velocityFill'),
+            qualityBadges: document.getElementById('qualityBadges'),
+            adviceText: document.getElementById('adviceText'),
+            historyList: document.getElementById('historyList'),
+            exerciseType: document.getElementById('exerciseType'),
+            toast: document.getElementById('toast')
         };
         
-        function showToast(message, isError = false) {
+        // Toast
+        function showToast(message, type = 'info') {
             elements.toast.textContent = message;
-            elements.toast.className = 'toast show' + (isError ? ' error' : '');
+            elements.toast.className = `toast show ${type}`;
             setTimeout(() => elements.toast.classList.remove('show'), 3000);
         }
         
+        // UI Update
         function updateUI(connected) {
             if (connected) {
                 elements.status.classList.add('connected');
@@ -267,14 +594,15 @@
             }
         }
         
+        // Connexion BLE
         async function connect() {
             if (!navigator.bluetooth) {
-                showToast('Web Bluetooth non supporté. Utilisez Chrome sur Android!', true);
+                showToast('Web Bluetooth non supporté. Utilisez Chrome sur Android!', 'error');
                 return;
             }
             
             try {
-                showToast('Recherche ESP32...');
+                showToast('Recherche du capteur...');
                 
                 device = await navigator.bluetooth.requestDevice({
                     filters: [{ name: 'ESP32' }],
@@ -292,19 +620,20 @@
                 
                 device.addEventListener('gattserverdisconnected', () => {
                     updateUI(false);
-                    showToast('ESP32 déconnecté', true);
+                    showToast('Capteur déconnecté', 'error');
                 });
                 
-                elements.deviceName.textContent = device.name;
                 updateUI(true);
-                showToast('Connecté avec succès!');
+                showToast('Capteur connecté !', 'success');
+                resetSet();
                 
             } catch (error) {
-                showToast('Erreur: ' + error.message, true);
+                showToast('Erreur: ' + error.message, 'error');
                 console.error(error);
             }
         }
         
+        // Déconnexion
         function disconnect() {
             if (device && device.gatt.connected) {
                 device.gatt.disconnect();
@@ -312,31 +641,254 @@
             updateUI(false);
         }
         
+        // Reset série
+        function resetSet() {
+            repCount = 0;
+            repHistory = [];
+            velocities = [];
+            previousZ = 1.0;
+            peakZ = 1.0;
+            valleyZ = 1.0;
+            movementPhase = 'neutral';
+            
+            elements.repCount.textContent = '0';
+            elements.repStatus.textContent = 'En attente...';
+            elements.avgVelocity.textContent = '0';
+            elements.romValue.textContent = '0';
+            elements.tempoValue.textContent = '0';
+            elements.fatigueValue.textContent = '0';
+            elements.velocityFill.style.width = '0%';
+            elements.qualityBadges.innerHTML = '<div class="quality-badge good">En attente</div>';
+            elements.adviceText.textContent = 'Commencez votre série. Le capteur détectera automatiquement vos répétitions.';
+            elements.historyList.innerHTML = '<div style="text-align: center; color: var(--text-secondary); padding: 20px;">Aucune répétition enregistrée</div>';
+        }
+        
+        // Traitement des données
         function handleData(event) {
             try {
                 const decoder = new TextDecoder('utf-8');
                 const jsonString = decoder.decode(event.target.value);
                 const data = JSON.parse(jsonString);
                 
-                if (data.ax !== undefined) elements.ax.textContent = data.ax.toFixed(2);
-                if (data.ay !== undefined) elements.ay.textContent = data.ay.toFixed(2);
-                if (data.az !== undefined) elements.az.textContent = data.az.toFixed(2);
-                if (data.gx !== undefined) elements.gx.textContent = data.gx.toFixed(1);
-                if (data.gy !== undefined) elements.gy.textContent = data.gy.toFixed(1);
-                if (data.gz !== undefined) elements.gz.textContent = data.gz.toFixed(1);
-                if (data.temp !== undefined) elements.temp.textContent = data.temp.toFixed(1);
+                analyzeMovement(data);
                 
             } catch (error) {
                 console.error('Erreur parsing:', error);
             }
         }
         
+        // Analyse du mouvement et détection de répétitions
+        function analyzeMovement(data) {
+            const currentExercise = elements.exerciseType.value;
+            const config = exerciseThresholds[currentExercise];
+            
+            // Axe Z pour la plupart des exercices (vertical)
+            const currentZ = data.az;
+            
+            // Calcul de la vélocité (changement d'accélération)
+            const velocity = Math.abs(currentZ - previousZ);
+            velocities.push(velocity);
+            if (velocities.length > 10) velocities.shift();
+            
+            // Affichage vélocité temps réel
+            const velocityPercent = Math.min(100, velocity * 100);
+            elements.velocityFill.style.width = `${velocityPercent}%`;
+            
+            // Machine à états pour détection de rep
+            if (movementPhase === 'neutral') {
+                // Détection du début d'un mouvement descendant
+                if (currentZ < (previousZ - config.threshold)) {
+                    movementPhase = 'down';
+                    valleyZ = currentZ;
+                    repStartTime = Date.now();
+                    elements.repStatus.textContent = 'Phase excentrique...';
+                }
+            }
+            else if (movementPhase === 'down') {
+                // Suivi du point le plus bas
+                if (currentZ < valleyZ) {
+                    valleyZ = currentZ;
+                }
+                // Détection de la remontée
+                else if (currentZ > (valleyZ + config.threshold)) {
+                    movementPhase = 'up';
+                    elements.repStatus.textContent = 'Phase concentrique...';
+                }
+            }
+            else if (movementPhase === 'up') {
+                // Suivi du point le plus haut
+                if (currentZ > peakZ) {
+                    peakZ = currentZ;
+                }
+                // Détection de la fin de rep (retour position haute)
+                if (currentZ > (peakZ - config.threshold * 0.5)) {
+                    // Calcul du ROM
+                    const rom = Math.abs(peakZ - valleyZ);
+                    
+                    // Validation de la rep
+                    if (rom >= config.minROM) {
+                        registerRep(rom);
+                    } else {
+                        showToast('ROM insuffisant !', 'warning');
+                    }
+                    
+                    // Reset pour prochaine rep
+                    movementPhase = 'neutral';
+                    peakZ = currentZ;
+                    valleyZ = currentZ;
+                }
+            }
+            
+            previousZ = currentZ;
+        }
+        
+        // Enregistrement d'une répétition
+        function registerRep(rom) {
+            repCount++;
+            const repTime = (Date.now() - repStartTime) / 1000;
+            const avgVel = velocities.reduce((a, b) => a + b, 0) / velocities.length;
+            
+            // Enregistrer dans l'historique
+            repHistory.push({
+                rep: repCount,
+                time: repTime,
+                velocity: avgVel,
+                rom: rom
+            });
+            
+            // Animation
+            elements.repCount.classList.add('rep-flash');
+            setTimeout(() => elements.repCount.classList.remove('rep-flash'), 300);
+            
+            // Mise à jour affichage
+            elements.repCount.textContent = repCount;
+            elements.repStatus.textContent = `Rep ${repCount} validée !`;
+            
+            // Calculs statistiques
+            updateStats();
+            
+            // Feedback sonore (vibration si disponible)
+            if (navigator.vibrate) {
+                navigator.vibrate(100);
+            }
+            
+            showToast(`Rep ${repCount} validée ! 💪`, 'success');
+        }
+        
+        // Mise à jour des statistiques
+        function updateStats() {
+            if (repHistory.length === 0) return;
+            
+            // Vitesse moyenne
+            const avgVelocity = repHistory.reduce((sum, rep) => sum + rep.velocity, 0) / repHistory.length;
+            elements.avgVelocity.textContent = (avgVelocity * 10).toFixed(2);
+            
+            // ROM moyen
+            const avgROM = repHistory.reduce((sum, rep) => sum + rep.rom, 0) / repHistory.length;
+            elements.romValue.textContent = (avgROM * 100).toFixed(0);
+            
+            // Tempo moyen
+            const avgTempo = repHistory.reduce((sum, rep) => sum + rep.time, 0) / repHistory.length;
+            elements.tempoValue.textContent = avgTempo.toFixed(1);
+            
+            // Fatigue (baisse de vélocité)
+            const firstVel = repHistory[0].velocity;
+            const lastVel = repHistory[repHistory.length - 1].velocity;
+            const fatigue = ((firstVel - lastVel) / firstVel) * 100;
+            elements.fatigueValue.textContent = Math.max(0, fatigue).toFixed(0);
+            
+            // Qualité
+            updateQuality(avgVelocity, avgROM, fatigue);
+            
+            // Conseils
+            updateAdvice(avgVelocity, avgROM, fatigue);
+            
+            // Historique
+            updateHistory();
+        }
+        
+        // Qualité du mouvement
+        function updateQuality(velocity, rom, fatigue) {
+            let badges = [];
+            
+            if (velocity > 0.5) {
+                badges.push('<div class="quality-badge good">Vitesse excellente</div>');
+            } else if (velocity > 0.3) {
+                badges.push('<div class="quality-badge warning">Vitesse correcte</div>');
+            } else {
+                badges.push('<div class="quality-badge bad">Vitesse faible</div>');
+            }
+            
+            if (rom > 0.7) {
+                badges.push('<div class="quality-badge good">ROM complet</div>');
+            } else if (rom > 0.5) {
+                badges.push('<div class="quality-badge warning">ROM partiel</div>');
+            } else {
+                badges.push('<div class="quality-badge bad">ROM insuffisant</div>');
+            }
+            
+            if (fatigue < 20) {
+                badges.push('<div class="quality-badge good">Forme maintenue</div>');
+            } else if (fatigue < 40) {
+                badges.push('<div class="quality-badge warning">Fatigue modérée</div>');
+            } else {
+                badges.push('<div class="quality-badge bad">Fatigue élevée</div>');
+            }
+            
+            elements.qualityBadges.innerHTML = badges.join('');
+        }
+        
+        // Conseils personnalisés
+        function updateAdvice(velocity, rom, fatigue) {
+            let advice = '';
+            
+            if (fatigue > 40) {
+                advice = '⚠️ Fatigue détectée. Pensez à arrêter la série pour éviter la blessure.';
+            } else if (rom < 0.5) {
+                advice = '📏 Amplitude incomplète. Essayez d\'aller plus bas pour un meilleur développement musculaire.';
+            } else if (velocity < 0.3) {
+                advice = '🐌 Vitesse faible. Augmentez l\'explosivité ou réduisez la charge.';
+            } else if (velocity > 0.7 && rom > 0.7 && fatigue < 20) {
+                advice = '🔥 Excellente forme ! Continuez comme ça !';
+            } else {
+                advice = '💪 Bonne série. Maintenez ce rythme et cette technique.';
+            }
+            
+            elements.adviceText.textContent = advice;
+        }
+        
+        // Historique
+        function updateHistory() {
+            if (repHistory.length === 0) return;
+            
+            let html = '';
+            repHistory.forEach(rep => {
+                html += `
+                    <div class="history-item">
+                        <div>
+                            <span class="history-reps">Rep ${rep.rep}</span>
+                            <span style="color: var(--text-secondary); margin-left: 8px;">
+                                ${rep.time.toFixed(1)}s
+                            </span>
+                        </div>
+                        <div style="color: var(--text-secondary);">
+                            ${(rep.velocity * 10).toFixed(2)} m/s
+                        </div>
+                    </div>
+                `;
+            });
+            
+            elements.historyList.innerHTML = html;
+        }
+        
+        // Event Listeners
         elements.connectBtn.addEventListener('click', connect);
         elements.disconnectBtn.addEventListener('click', disconnect);
+        elements.resetBtn.addEventListener('click', resetSet);
         
-        // Vérifier le support au chargement
+        // Vérification support
         if (!navigator.bluetooth) {
-            showToast('⚠️ Ouvrez cette page dans Chrome sur Android!', true);
+            showToast('⚠️ Ouvrez dans Chrome sur Android !', 'error');
         }
     </script>
 </body>
