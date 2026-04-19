@@ -4,18 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#0f172a">
-    <title>Rep Tracker - Musculation Connectée</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Rep Tracker Pro</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         :root {
-            /* Colors - Sport/Performance theme */
             --bg-primary: #0f172a;
             --bg-secondary: #1e293b;
             --bg-tertiary: #334155;
             --accent-primary: #22c55e;
             --accent-secondary: #ef4444;
             --accent-warning: #f59e0b;
+            --accent-blue: #3b82f6;
             --text-primary: #f1f5f9;
             --text-secondary: #94a3b8;
             --border-color: #475569;
@@ -23,20 +25,78 @@
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            background: var(--bg-primary);
             color: var(--text-primary);
             min-height: 100vh;
-            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+            padding-bottom: 70px;
+            overflow-x: hidden;
         }
         
-        .container {
-            max-width: 500px;
-            margin: 0 auto;
+        /* ============================================
+           NAVIGATION (Bottom Tab Bar)
+           ============================================ */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0 calc(8px + env(safe-area-inset-bottom));
+            z-index: 100;
+            box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.3);
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 8px 16px;
+            min-width: 48px;
+            min-height: 48px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+            background: none;
+            border: none;
+            touch-action: manipulation;
+        }
+        
+        .nav-item.active {
+            color: var(--accent-primary);
+        }
+        
+        .nav-icon {
+            font-size: 24px;
+        }
+        
+        .nav-label {
+            font-size: 11px;
+            font-weight: 600;
+        }
+        
+        /* ============================================
+           PAGES
+           ============================================ */
+        .page {
+            display: none;
             padding: 16px;
+            padding-top: calc(16px + env(safe-area-inset-top));
+            max-width: 600px;
+            margin: 0 auto;
         }
         
-        /* Header */
-        .header {
+        .page.active {
+            display: block;
+        }
+        
+        /* ============================================
+           HEADER
+           ============================================ */
+        .page-header {
             background: var(--bg-secondary);
             border: 1px solid var(--border-color);
             border-radius: 16px;
@@ -44,26 +104,19 @@
             margin-bottom: 16px;
         }
         
-        .app-title {
-            font-size: 24px;
+        .page-title {
+            font-size: 28px;
             font-weight: 700;
-            margin-bottom: 8px;
-            background: linear-gradient(90deg, var(--accent-primary), #3b82f6);
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-blue));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
         }
         
-        .status-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 12px;
-        }
-        
-        .status {
+        .status-badge {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             padding: 6px 12px;
             background: var(--bg-tertiary);
             border-radius: 20px;
@@ -77,18 +130,20 @@
             background: var(--accent-secondary);
         }
         
-        .status.connected .status-dot {
+        .status-badge.connected .status-dot {
             background: var(--accent-primary);
             box-shadow: 0 0 8px var(--accent-primary);
-            animation: pulse-dot 2s infinite;
+            animation: pulse 2s infinite;
         }
         
-        @keyframes pulse-dot {
+        @keyframes pulse {
             0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+            50% { opacity: 0.6; }
         }
         
-        /* Buttons */
+        /* ============================================
+           BUTTONS
+           ============================================ */
         .btn {
             width: 100%;
             min-height: 48px;
@@ -108,9 +163,7 @@
             box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
         }
         
-        .btn-primary:active {
-            transform: scale(0.98);
-        }
+        .btn-primary:active { transform: scale(0.98); }
         
         .btn-secondary {
             background: var(--bg-tertiary);
@@ -128,8 +181,10 @@
             color: white;
         }
         
-        /* Exercise Selection */
-        .exercise-select {
+        /* ============================================
+           PAGE LIVE - REP COUNTER
+           ============================================ */
+        .exercise-selector {
             background: var(--bg-secondary);
             border: 1px solid var(--border-color);
             border-radius: 12px;
@@ -137,7 +192,7 @@
             margin-bottom: 16px;
         }
         
-        .exercise-select label {
+        .exercise-selector label {
             display: block;
             font-size: 14px;
             font-weight: 600;
@@ -145,7 +200,7 @@
             color: var(--text-secondary);
         }
         
-        .exercise-select select {
+        .exercise-selector select {
             width: 100%;
             padding: 12px;
             background: var(--bg-tertiary);
@@ -155,12 +210,11 @@
             font-size: 16px;
         }
         
-        /* Rep Counter - Main Display */
-        .rep-counter {
-            background: var(--bg-secondary);
+        .rep-counter-main {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(59, 130, 246, 0.1));
             border: 2px solid var(--accent-primary);
             border-radius: 20px;
-            padding: 32px;
+            padding: 40px 20px;
             margin-bottom: 16px;
             text-align: center;
         }
@@ -171,11 +225,11 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             color: var(--text-secondary);
-            margin-bottom: 8px;
+            margin-bottom: 12px;
         }
         
         .rep-count {
-            font-size: 72px;
+            font-size: 96px;
             font-weight: 700;
             color: var(--accent-primary);
             line-height: 1;
@@ -184,49 +238,46 @@
         }
         
         .rep-status {
-            font-size: 16px;
+            font-size: 18px;
             color: var(--text-secondary);
         }
         
-        /* Stats Grid */
-        .stats-grid {
+        .live-stats {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 12px;
             margin-bottom: 16px;
         }
         
-        .stat-card {
+        .live-stat-card {
             background: var(--bg-secondary);
             border: 1px solid var(--border-color);
             border-radius: 12px;
             padding: 16px;
         }
         
-        .stat-label {
+        .live-stat-label {
             font-size: 12px;
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
             color: var(--text-secondary);
             margin-bottom: 6px;
         }
         
-        .stat-value {
-            font-size: 28px;
+        .live-stat-value {
+            font-size: 32px;
             font-weight: 700;
             color: var(--text-primary);
             font-variant-numeric: tabular-nums;
         }
         
-        .stat-unit {
+        .live-stat-unit {
             font-size: 14px;
             color: var(--text-secondary);
             margin-left: 4px;
         }
         
-        /* Velocity Bar */
-        .velocity-bar {
+        .velocity-bar-container {
             background: var(--bg-secondary);
             border: 1px solid var(--border-color);
             border-radius: 12px;
@@ -234,7 +285,7 @@
             margin-bottom: 16px;
         }
         
-        .velocity-label {
+        .velocity-bar-label {
             font-size: 14px;
             font-weight: 600;
             margin-bottom: 8px;
@@ -246,7 +297,6 @@
             background: var(--bg-tertiary);
             border-radius: 6px;
             overflow: hidden;
-            position: relative;
         }
         
         .velocity-fill {
@@ -256,8 +306,7 @@
             transition: width 0.3s ease;
         }
         
-        /* Quality Indicator */
-        .quality-indicator {
+        .quality-panel {
             background: var(--bg-secondary);
             border: 1px solid var(--border-color);
             border-radius: 12px;
@@ -265,7 +314,7 @@
             margin-bottom: 16px;
         }
         
-        .quality-label {
+        .quality-title {
             font-size: 14px;
             font-weight: 600;
             margin-bottom: 12px;
@@ -300,8 +349,60 @@
             color: var(--accent-secondary);
         }
         
-        /* History */
-        .history {
+        /* ============================================
+           PAGE STATS
+           ============================================ */
+        .stats-summary {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .summary-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .summary-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--accent-primary);
+            margin-bottom: 4px;
+        }
+        
+        .summary-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+        
+        .chart-container {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+        
+        .chart-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+        }
+        
+        .chart-canvas {
+            width: 100%;
+            height: 200px;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+        }
+        
+        .session-history {
             background: var(--bg-secondary);
             border: 1px solid var(--border-color);
             border-radius: 12px;
@@ -310,47 +411,187 @@
         }
         
         .history-title {
-            font-size: 14px;
+            font-size: 16px;
             font-weight: 600;
             margin-bottom: 12px;
-            color: var(--text-secondary);
+            color: var(--text-primary);
         }
         
         .history-item {
             display: flex;
             justify-content: space-between;
+            align-items: center;
             padding: 12px;
             background: var(--bg-tertiary);
             border-radius: 8px;
             margin-bottom: 8px;
         }
         
+        .history-date {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
         .history-reps {
+            font-size: 18px;
             font-weight: 700;
             color: var(--accent-primary);
         }
         
-        /* Advice Panel */
-        .advice-panel {
-            background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(59, 130, 246, 0.1));
-            border: 1px solid rgba(34, 197, 94, 0.3);
+        /* ============================================
+           PAGE PROFILE
+           ============================================ */
+        .profile-section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
             border-radius: 12px;
-            padding: 16px;
+            padding: 20px;
             margin-bottom: 16px;
         }
         
-        .advice-icon {
-            font-size: 24px;
-            margin-bottom: 8px;
-        }
-        
-        .advice-text {
-            font-size: 14px;
-            line-height: 1.5;
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
             color: var(--text-primary);
         }
         
-        /* Toast */
+        .muscle-groups {
+            display: grid;
+            gap: 12px;
+        }
+        
+        .muscle-group {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .muscle-group:active {
+            transform: scale(0.98);
+        }
+        
+        .muscle-group-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .muscle-group-name {
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .muscle-group-icon {
+            font-size: 24px;
+        }
+        
+        .muscle-group-count {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        .exercise-list {
+            display: none;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .exercise-list.show {
+            display: block;
+        }
+        
+        .exercise-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            color: var(--text-secondary);
+        }
+        
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        
+        .settings-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .settings-item:last-child {
+            border-bottom: none;
+        }
+        
+        .settings-label {
+            font-size: 16px;
+            color: var(--text-primary);
+        }
+        
+        .toggle {
+            position: relative;
+            width: 48px;
+            height: 28px;
+            background: var(--bg-tertiary);
+            border-radius: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .toggle.active {
+            background: var(--accent-primary);
+        }
+        
+        .toggle-knob {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 50%;
+            transition: left 0.2s;
+        }
+        
+        .toggle.active .toggle-knob {
+            left: 22px;
+        }
+        
+        /* ============================================
+           UTILITIES
+           ============================================ */
+        .hidden {
+            display: none !important;
+        }
+        
         .toast {
             position: fixed;
             top: 20px;
@@ -367,7 +608,7 @@
             transform: translateY(-200px);
             transition: transform 0.3s;
             z-index: 1000;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
         }
         
         .toast.show {
@@ -378,19 +619,9 @@
             border-left-color: var(--accent-secondary);
         }
         
-        .toast.warning {
-            border-left-color: var(--accent-warning);
-        }
-        
-        .hidden {
-            display: none;
-        }
-        
-        /* Animations */
         @keyframes rep-flash {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
         }
         
         .rep-flash {
@@ -399,271 +630,510 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <h1 class="app-title">💪 Rep Tracker</h1>
-            <div class="status-row">
-                <div class="status" id="status">
-                    <span class="status-dot"></span>
-                    <span id="statusText">Déconnecté</span>
-                </div>
+    <!-- ============================================
+         PAGE 1: LIVE TRACKING
+         ============================================ -->
+    <div id="pageLive" class="page active">
+        <div class="page-header">
+            <h1 class="page-title">💪 Live Tracking</h1>
+            <div class="status-badge" id="statusBadge">
+                <span class="status-dot"></span>
+                <span id="statusText">Déconnecté</span>
             </div>
         </div>
         
         <!-- Connect Section -->
         <div id="connectSection">
             <button class="btn btn-primary" id="connectBtn">
-                Connecter le capteur
+                📡 Connecter le capteur
             </button>
         </div>
         
-        <!-- Connected Section -->
-        <div id="connectedSection" class="hidden">
-            <!-- Exercise Selection -->
-            <div class="exercise-select">
-                <label for="exerciseType">Type d'exercice</label>
-                <select id="exerciseType">
-                    <option value="squat">Squat</option>
-                    <option value="bench">Développé couché</option>
-                    <option value="deadlift">Soulevé de terre</option>
-                    <option value="row">Rowing</option>
-                    <option value="curl">Curl biceps</option>
-                    <option value="press">Développé militaire</option>
+        <!-- Live Section -->
+        <div id="liveSection" class="hidden">
+            <!-- Exercise Selector -->
+            <div class="exercise-selector">
+                <label for="exerciseSelect">Exercice actuel</label>
+                <select id="exerciseSelect">
+                    <!-- Populated dynamically -->
                 </select>
             </div>
             
             <!-- Rep Counter -->
-            <div class="rep-counter">
+            <div class="rep-counter-main">
                 <div class="rep-label">Répétitions</div>
                 <div class="rep-count" id="repCount">0</div>
                 <div class="rep-status" id="repStatus">En attente...</div>
             </div>
             
-            <!-- Stats Grid -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-label">Vitesse moy.</div>
-                    <div class="stat-value">
-                        <span id="avgVelocity">0</span>
-                        <span class="stat-unit">m/s</span>
+            <!-- Live Stats -->
+            <div class="live-stats">
+                <div class="live-stat-card">
+                    <div class="live-stat-label">Vitesse</div>
+                    <div class="live-stat-value">
+                        <span id="liveVelocity">0</span>
+                        <span class="live-stat-unit">m/s</span>
                     </div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-label">ROM</div>
-                    <div class="stat-value">
-                        <span id="romValue">0</span>
-                        <span class="stat-unit">%</span>
+                <div class="live-stat-card">
+                    <div class="live-stat-label">ROM</div>
+                    <div class="live-stat-value">
+                        <span id="liveROM">0</span>
+                        <span class="live-stat-unit">%</span>
                     </div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-label">Tempo</div>
-                    <div class="stat-value">
-                        <span id="tempoValue">0</span>
-                        <span class="stat-unit">s</span>
+                <div class="live-stat-card">
+                    <div class="live-stat-label">Tempo</div>
+                    <div class="live-stat-value">
+                        <span id="liveTempo">0</span>
+                        <span class="live-stat-unit">s</span>
                     </div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-label">Fatigue</div>
-                    <div class="stat-value">
-                        <span id="fatigueValue">0</span>
-                        <span class="stat-unit">%</span>
+                <div class="live-stat-card">
+                    <div class="live-stat-label">Fatigue</div>
+                    <div class="live-stat-value">
+                        <span id="liveFatigue">0</span>
+                        <span class="live-stat-unit">%</span>
                     </div>
                 </div>
             </div>
             
             <!-- Velocity Bar -->
-            <div class="velocity-bar">
-                <div class="velocity-label">Vélocité en temps réel</div>
+            <div class="velocity-bar-container">
+                <div class="velocity-bar-label">Vélocité temps réel</div>
                 <div class="velocity-track">
                     <div class="velocity-fill" id="velocityFill" style="width: 0%"></div>
                 </div>
             </div>
             
-            <!-- Quality Indicator -->
-            <div class="quality-indicator">
-                <div class="quality-label">Qualité du mouvement</div>
+            <!-- Quality -->
+            <div class="quality-panel">
+                <div class="quality-title">Qualité du mouvement</div>
                 <div class="quality-badges" id="qualityBadges">
                     <div class="quality-badge good">En attente</div>
                 </div>
             </div>
             
-            <!-- Advice Panel -->
-            <div class="advice-panel" id="advicePanel">
-                <div class="advice-icon">💡</div>
-                <div class="advice-text" id="adviceText">
-                    Commencez votre série. Le capteur détectera automatiquement vos répétitions.
-                </div>
-            </div>
-            
-            <!-- History -->
-            <div class="history">
-                <div class="history-title">Historique de la série</div>
-                <div id="historyList">
-                    <div style="text-align: center; color: var(--text-secondary); padding: 20px;">
-                        Aucune répétition enregistrée
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Control Buttons -->
+            <!-- Controls -->
             <button class="btn btn-warning" id="resetBtn" style="margin-bottom: 8px;">
-                Nouvelle série
+                🔄 Nouvelle série
             </button>
             <button class="btn btn-danger" id="disconnectBtn">
-                Déconnecter
+                🔌 Déconnecter
             </button>
         </div>
     </div>
     
+    <!-- ============================================
+         PAGE 2: STATISTICS
+         ============================================ -->
+    <div id="pageStats" class="page">
+        <div class="page-header">
+            <h1 class="page-title">📊 Statistiques</h1>
+        </div>
+        
+        <!-- Summary Cards -->
+        <div class="stats-summary">
+            <div class="summary-card">
+                <div class="summary-value" id="totalSets">0</div>
+                <div class="summary-label">Séries totales</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-value" id="totalReps">0</div>
+                <div class="summary-label">Répétitions totales</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-value" id="avgVelocityStat">0</div>
+                <div class="summary-label">Vitesse moy. (m/s)</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-value" id="avgROMStat">0</div>
+                <div class="summary-label">ROM moy. (%)</div>
+            </div>
+        </div>
+        
+        <!-- Chart: Velocity per set -->
+        <div class="chart-container">
+            <div class="chart-title">📈 Vélocité par série</div>
+            <canvas id="velocityChart" class="chart-canvas"></canvas>
+        </div>
+        
+        <!-- Chart: Reps per set -->
+        <div class="chart-container">
+            <div class="chart-title">📊 Répétitions par série</div>
+            <canvas id="repsChart" class="chart-canvas"></canvas>
+        </div>
+        
+        <!-- Session History -->
+        <div class="session-history">
+            <div class="history-title">📅 Historique des séances</div>
+            <div id="sessionHistoryList">
+                <div style="text-align: center; color: var(--text-secondary); padding: 20px;">
+                    Aucune séance enregistrée
+                </div>
+            </div>
+        </div>
+        
+        <button class="btn btn-secondary" id="clearHistoryBtn">
+            🗑️ Effacer l'historique
+        </button>
+    </div>
+    
+    <!-- ============================================
+         PAGE 3: PROFILE
+         ============================================ -->
+    <div id="pageProfile" class="page">
+        <div class="page-header">
+            <h1 class="page-title">⚙️ Profil</h1>
+        </div>
+        
+        <!-- Muscle Groups & Exercises -->
+        <div class="profile-section">
+            <div class="section-title">💪 Exercices par groupe musculaire</div>
+            <div class="muscle-groups" id="muscleGroups">
+                <!-- Populated dynamically -->
+            </div>
+        </div>
+        
+        <!-- Add Custom Exercise -->
+        <div class="profile-section">
+            <div class="section-title">➕ Ajouter un exercice</div>
+            <div class="form-group">
+                <label class="form-label" for="newExerciseName">Nom de l'exercice</label>
+                <input type="text" class="form-input" id="newExerciseName" placeholder="Ex: Squat bulgare">
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="newExerciseGroup">Groupe musculaire</label>
+                <select class="form-input" id="newExerciseGroup">
+                    <option value="legs">🦵 Jambes</option>
+                    <option value="chest">💪 Pectoraux</option>
+                    <option value="back">🏋️ Dos</option>
+                    <option value="shoulders">🤸 Épaules</option>
+                    <option value="arms">💪 Bras</option>
+                    <option value="abs">🔥 Abdos</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="newExerciseThreshold">Seuil de détection (0.1 - 0.5)</label>
+                <input type="number" class="form-input" id="newExerciseThreshold" value="0.3" min="0.1" max="0.5" step="0.05">
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="newExerciseROM">ROM minimum (20 - 80%)</label>
+                <input type="number" class="form-input" id="newExerciseROM" value="50" min="20" max="80" step="5">
+            </div>
+            <button class="btn btn-primary" id="addExerciseBtn">
+                ✅ Ajouter l'exercice
+            </button>
+        </div>
+        
+        <!-- Settings -->
+        <div class="profile-section">
+            <div class="section-title">⚙️ Paramètres</div>
+            <div class="settings-item">
+                <div class="settings-label">Vibrations</div>
+                <div class="toggle active" id="toggleVibration">
+                    <div class="toggle-knob"></div>
+                </div>
+            </div>
+            <div class="settings-item">
+                <div class="settings-label">Sons</div>
+                <div class="toggle active" id="toggleSound">
+                    <div class="toggle-knob"></div>
+                </div>
+            </div>
+            <div class="settings-item">
+                <div class="settings-label">Mode sombre</div>
+                <div class="toggle active" id="toggleDarkMode">
+                    <div class="toggle-knob"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ============================================
+         BOTTOM NAVIGATION
+         ============================================ -->
+    <nav class="bottom-nav">
+        <button class="nav-item active" data-page="pageLive">
+            <div class="nav-icon">🏋️</div>
+            <div class="nav-label">Live</div>
+        </button>
+        <button class="nav-item" data-page="pageStats">
+            <div class="nav-icon">📊</div>
+            <div class="nav-label">Stats</div>
+        </button>
+        <button class="nav-item" data-page="pageProfile">
+            <div class="nav-icon">⚙️</div>
+            <div class="nav-label">Profil</div>
+        </button>
+    </nav>
+    
+    <!-- Toast -->
     <div class="toast" id="toast"></div>
     
     <script>
-        // Configuration BLE
+        // ============================================
+        // CONFIGURATION
+        // ============================================
         const BLE_SERVICE_UUID = '4fafc201-1fb5-459e-8fcc-c5c9c331914b';
         const BLE_CHARACTERISTIC_UUID = 'beb5483e-36e1-4688-b7f5-ea07361b26a8';
         
-        // État global
+        // ============================================
+        // STATE
+        // ============================================
         let device = null;
         let characteristic = null;
+        let currentPage = 'pageLive';
         let repCount = 0;
-        let isTracking = false;
         let repHistory = [];
+        let sessionHistory = [];
+        let exercises = {};
+        let settings = {
+            vibration: true,
+            sound: true,
+            darkMode: true
+        };
         
-        // Détection de répétitions
+        // Movement detection
         let previousZ = 1.0;
         let peakZ = 1.0;
         let valleyZ = 1.0;
-        let movementPhase = 'neutral'; // neutral, up, down
+        let movementPhase = 'neutral';
         let repStartTime = 0;
         let velocities = [];
-        let currentROM = 0;
         
-        // Seuils configurables par exercice
-        const exerciseThresholds = {
-            squat: { threshold: 0.3, minROM: 0.5 },
-            bench: { threshold: 0.25, minROM: 0.4 },
-            deadlift: { threshold: 0.35, minROM: 0.6 },
-            row: { threshold: 0.2, minROM: 0.3 },
-            curl: { threshold: 0.15, minROM: 0.4 },
-            press: { threshold: 0.25, minROM: 0.45 }
+        // ============================================
+        // DEFAULT EXERCISES DATABASE
+        // ============================================
+        const defaultExercises = {
+            legs: [
+                { name: 'Squat', threshold: 0.3, minROM: 50 },
+                { name: 'Soulevé de terre', threshold: 0.35, minROM: 60 },
+                { name: 'Fentes', threshold: 0.25, minROM: 45 },
+                { name: 'Leg press', threshold: 0.3, minROM: 50 }
+            ],
+            chest: [
+                { name: 'Développé couché', threshold: 0.25, minROM: 40 },
+                { name: 'Développé incliné', threshold: 0.25, minROM: 40 },
+                { name: 'Pompes', threshold: 0.2, minROM: 35 },
+                { name: 'Écarté haltères', threshold: 0.2, minROM: 35 }
+            ],
+            back: [
+                { name: 'Rowing barre', threshold: 0.2, minROM: 30 },
+                { name: 'Tractions', threshold: 0.3, minROM: 45 },
+                { name: 'Rowing haltère', threshold: 0.2, minROM: 30 },
+                { name: 'Tirage vertical', threshold: 0.25, minROM: 40 }
+            ],
+            shoulders: [
+                { name: 'Développé militaire', threshold: 0.25, minROM: 45 },
+                { name: 'Élévations latérales', threshold: 0.15, minROM: 35 },
+                { name: 'Élévations frontales', threshold: 0.15, minROM: 35 },
+                { name: 'Oiseau', threshold: 0.15, minROM: 30 }
+            ],
+            arms: [
+                { name: 'Curl biceps', threshold: 0.15, minROM: 40 },
+                { name: 'Extension triceps', threshold: 0.15, minROM: 40 },
+                { name: 'Curl marteau', threshold: 0.15, minROM: 40 },
+                { name: 'Dips triceps', threshold: 0.25, minROM: 45 }
+            ],
+            abs: [
+                { name: 'Crunch', threshold: 0.2, minROM: 30 },
+                { name: 'Planche', threshold: 0.1, minROM: 20 },
+                { name: 'Russian twist', threshold: 0.15, minROM: 25 },
+                { name: 'Relevé de jambes', threshold: 0.2, minROM: 35 }
+            ]
         };
         
-        // Éléments DOM
-        const elements = {
-            connectBtn: document.getElementById('connectBtn'),
-            disconnectBtn: document.getElementById('disconnectBtn'),
-            resetBtn: document.getElementById('resetBtn'),
-            status: document.getElementById('status'),
-            statusText: document.getElementById('statusText'),
-            connectSection: document.getElementById('connectSection'),
-            connectedSection: document.getElementById('connectedSection'),
-            repCount: document.getElementById('repCount'),
-            repStatus: document.getElementById('repStatus'),
-            avgVelocity: document.getElementById('avgVelocity'),
-            romValue: document.getElementById('romValue'),
-            tempoValue: document.getElementById('tempoValue'),
-            fatigueValue: document.getElementById('fatigueValue'),
-            velocityFill: document.getElementById('velocityFill'),
-            qualityBadges: document.getElementById('qualityBadges'),
-            adviceText: document.getElementById('adviceText'),
-            historyList: document.getElementById('historyList'),
-            exerciseType: document.getElementById('exerciseType'),
-            toast: document.getElementById('toast')
-        };
-        
-        // Toast
-        function showToast(message, type = 'info') {
-            elements.toast.textContent = message;
-            elements.toast.className = `toast show ${type}`;
-            setTimeout(() => elements.toast.classList.remove('show'), 3000);
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+        function init() {
+            loadFromLocalStorage();
+            renderExerciseSelector();
+            renderMuscleGroups();
+            setupEventListeners();
+            updateStatsPage();
         }
         
-        // UI Update
-        function updateUI(connected) {
-            if (connected) {
-                elements.status.classList.add('connected');
-                elements.statusText.textContent = 'Connecté';
-                elements.connectSection.classList.add('hidden');
-                elements.connectedSection.classList.remove('hidden');
-            } else {
-                elements.status.classList.remove('connected');
-                elements.statusText.textContent = 'Déconnecté';
-                elements.connectSection.classList.remove('hidden');
-                elements.connectedSection.classList.add('hidden');
+        function loadFromLocalStorage() {
+            const savedExercises = localStorage.getItem('reptracker_exercises');
+            exercises = savedExercises ? JSON.parse(savedExercises) : defaultExercises;
+            
+            const savedSessions = localStorage.getItem('reptracker_sessions');
+            sessionHistory = savedSessions ? JSON.parse(savedSessions) : [];
+            
+            const savedSettings = localStorage.getItem('reptracker_settings');
+            if (savedSettings) {
+                settings = JSON.parse(savedSettings);
+                applySettings();
             }
         }
         
-        // Connexion BLE
+        function saveToLocalStorage() {
+            localStorage.setItem('reptracker_exercises', JSON.stringify(exercises));
+            localStorage.setItem('reptracker_sessions', JSON.stringify(sessionHistory));
+            localStorage.setItem('reptracker_settings', JSON.stringify(settings));
+        }
+        
+        // ============================================
+        // NAVIGATION
+        // ============================================
+        function switchPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            
+            document.getElementById(pageId).classList.add('active');
+            document.querySelector(`[data-page="${pageId}"]`).classList.add('active');
+            
+            currentPage = pageId;
+            
+            if (pageId === 'pageStats') {
+                updateStatsPage();
+            }
+        }
+        
+        // ============================================
+        // RENDER FUNCTIONS
+        // ============================================
+        function renderExerciseSelector() {
+            const select = document.getElementById('exerciseSelect');
+            select.innerHTML = '';
+            
+            Object.keys(exercises).forEach(group => {
+                const optgroup = document.createElement('optgroup');
+                optgroup.label = getMuscleGroupName(group);
+                
+                exercises[group].forEach(ex => {
+                    const option = document.createElement('option');
+                    option.value = `${group}:${ex.name}`;
+                    option.textContent = ex.name;
+                    optgroup.appendChild(option);
+                });
+                
+                select.appendChild(optgroup);
+            });
+        }
+        
+        function renderMuscleGroups() {
+            const container = document.getElementById('muscleGroups');
+            container.innerHTML = '';
+            
+            const muscleGroupIcons = {
+                legs: '🦵',
+                chest: '💪',
+                back: '🏋️',
+                shoulders: '🤸',
+                arms: '💪',
+                abs: '🔥'
+            };
+            
+            Object.keys(exercises).forEach(group => {
+                const div = document.createElement('div');
+                div.className = 'muscle-group';
+                div.innerHTML = `
+                    <div class="muscle-group-header">
+                        <div class="muscle-group-name">
+                            <span class="muscle-group-icon">${muscleGroupIcons[group]}</span>
+                            ${getMuscleGroupName(group)}
+                        </div>
+                        <div class="muscle-group-count">${exercises[group].length} exercices</div>
+                    </div>
+                    <div class="exercise-list" id="list-${group}">
+                        ${exercises[group].map((ex, i) => `
+                            <div class="exercise-item">
+                                <span>${ex.name}</span>
+                                <button class="btn-secondary" style="padding: 4px 8px; font-size: 12px;" onclick="deleteExercise('${group}', ${i})">🗑️</button>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                
+                div.querySelector('.muscle-group-header').addEventListener('click', () => {
+                    document.getElementById(`list-${group}`).classList.toggle('show');
+                });
+                
+                container.appendChild(div);
+            });
+        }
+        
+        function getMuscleGroupName(key) {
+            const names = {
+                legs: '🦵 Jambes',
+                chest: '💪 Pectoraux',
+                back: '🏋️ Dos',
+                shoulders: '🤸 Épaules',
+                arms: '💪 Bras',
+                abs: '🔥 Abdos'
+            };
+            return names[key] || key;
+        }
+        
+        // ============================================
+        // BLE CONNECTION
+        // ============================================
         async function connect() {
             if (!navigator.bluetooth) {
-                showToast('Web Bluetooth non supporté. Utilisez Chrome sur Android!', 'error');
+                showToast('Web Bluetooth non supporté', 'error');
                 return;
             }
             
             try {
-                showToast('Recherche du capteur...');
-                
+                showToast('Recherche...');
                 device = await navigator.bluetooth.requestDevice({
                     filters: [{ name: 'ESP32' }],
                     optionalServices: [BLE_SERVICE_UUID]
                 });
                 
-                showToast('Connexion...');
                 const server = await device.gatt.connect();
-                
                 const service = await server.getPrimaryService(BLE_SERVICE_UUID);
                 characteristic = await service.getCharacteristic(BLE_CHARACTERISTIC_UUID);
                 
                 await characteristic.startNotifications();
                 characteristic.addEventListener('characteristicvaluechanged', handleData);
                 
-                device.addEventListener('gattserverdisconnected', () => {
-                    updateUI(false);
-                    showToast('Capteur déconnecté', 'error');
-                });
+                device.addEventListener('gattserverdisconnected', onDisconnect);
                 
-                updateUI(true);
-                showToast('Capteur connecté !', 'success');
+                updateConnectionUI(true);
+                showToast('Connecté !', 'success');
                 resetSet();
                 
             } catch (error) {
                 showToast('Erreur: ' + error.message, 'error');
-                console.error(error);
             }
         }
         
-        // Déconnexion
         function disconnect() {
             if (device && device.gatt.connected) {
                 device.gatt.disconnect();
             }
-            updateUI(false);
+            updateConnectionUI(false);
         }
         
-        // Reset série
-        function resetSet() {
-            repCount = 0;
-            repHistory = [];
-            velocities = [];
-            previousZ = 1.0;
-            peakZ = 1.0;
-            valleyZ = 1.0;
-            movementPhase = 'neutral';
+        function onDisconnect() {
+            updateConnectionUI(false);
+            showToast('Déconnecté', 'error');
+        }
+        
+        function updateConnectionUI(connected) {
+            const badge = document.getElementById('statusBadge');
+            const text = document.getElementById('statusText');
             
-            elements.repCount.textContent = '0';
-            elements.repStatus.textContent = 'En attente...';
-            elements.avgVelocity.textContent = '0';
-            elements.romValue.textContent = '0';
-            elements.tempoValue.textContent = '0';
-            elements.fatigueValue.textContent = '0';
-            elements.velocityFill.style.width = '0%';
-            elements.qualityBadges.innerHTML = '<div class="quality-badge good">En attente</div>';
-            elements.adviceText.textContent = 'Commencez votre série. Le capteur détectera automatiquement vos répétitions.';
-            elements.historyList.innerHTML = '<div style="text-align: center; color: var(--text-secondary); padding: 20px;">Aucune répétition enregistrée</div>';
+            if (connected) {
+                badge.classList.add('connected');
+                text.textContent = 'Connecté';
+                document.getElementById('connectSection').classList.add('hidden');
+                document.getElementById('liveSection').classList.remove('hidden');
+            } else {
+                badge.classList.remove('connected');
+                text.textContent = 'Déconnecté';
+                document.getElementById('connectSection').classList.remove('hidden');
+                document.getElementById('liveSection').classList.add('hidden');
+            }
         }
         
-        // Traitement des données
+        // ============================================
+        // REP DETECTION
+        // ============================================
         function handleData(event) {
             try {
                 const decoder = new TextDecoder('utf-8');
@@ -673,66 +1143,57 @@
                 analyzeMovement(data);
                 
             } catch (error) {
-                console.error('Erreur parsing:', error);
+                console.error('Parse error:', error);
             }
         }
         
-        // Analyse du mouvement et détection de répétitions
         function analyzeMovement(data) {
-            const currentExercise = elements.exerciseType.value;
-            const config = exerciseThresholds[currentExercise];
+            const selectValue = document.getElementById('exerciseSelect').value;
+            const [group, exerciseName] = selectValue.split(':');
+            const exercise = exercises[group].find(ex => ex.name === exerciseName);
             
-            // Axe Z pour la plupart des exercices (vertical)
+            if (!exercise) return;
+            
             const currentZ = data.az;
-            
-            // Calcul de la vélocité (changement d'accélération)
             const velocity = Math.abs(currentZ - previousZ);
             velocities.push(velocity);
             if (velocities.length > 10) velocities.shift();
             
-            // Affichage vélocité temps réel
+            // Update velocity bar
             const velocityPercent = Math.min(100, velocity * 100);
-            elements.velocityFill.style.width = `${velocityPercent}%`;
+            document.getElementById('velocityFill').style.width = `${velocityPercent}%`;
             
-            // Machine à états pour détection de rep
+            const threshold = exercise.threshold;
+            const minROM = exercise.minROM / 100;
+            
+            // State machine
             if (movementPhase === 'neutral') {
-                // Détection du début d'un mouvement descendant
-                if (currentZ < (previousZ - config.threshold)) {
+                if (currentZ < (previousZ - threshold)) {
                     movementPhase = 'down';
                     valleyZ = currentZ;
                     repStartTime = Date.now();
-                    elements.repStatus.textContent = 'Phase excentrique...';
+                    document.getElementById('repStatus').textContent = 'Phase excentrique...';
                 }
-            }
-            else if (movementPhase === 'down') {
-                // Suivi du point le plus bas
+            } else if (movementPhase === 'down') {
                 if (currentZ < valleyZ) {
                     valleyZ = currentZ;
-                }
-                // Détection de la remontée
-                else if (currentZ > (valleyZ + config.threshold)) {
+                } else if (currentZ > (valleyZ + threshold)) {
                     movementPhase = 'up';
-                    elements.repStatus.textContent = 'Phase concentrique...';
+                    document.getElementById('repStatus').textContent = 'Phase concentrique...';
                 }
-            }
-            else if (movementPhase === 'up') {
-                // Suivi du point le plus haut
+            } else if (movementPhase === 'up') {
                 if (currentZ > peakZ) {
                     peakZ = currentZ;
                 }
-                // Détection de la fin de rep (retour position haute)
-                if (currentZ > (peakZ - config.threshold * 0.5)) {
-                    // Calcul du ROM
+                if (currentZ > (peakZ - threshold * 0.5)) {
                     const rom = Math.abs(peakZ - valleyZ);
                     
-                    // Validation de la rep
-                    if (rom >= config.minROM) {
+                    if (rom >= minROM) {
                         registerRep(rom);
                     } else {
-                        showToast('ROM insuffisant !', 'warning');
+                        showToast('ROM insuffisant', 'warning');
                     }
                     
-                    // Reset pour prochaine rep
                     movementPhase = 'neutral';
                     peakZ = currentZ;
                     valleyZ = currentZ;
@@ -742,13 +1203,11 @@
             previousZ = currentZ;
         }
         
-        // Enregistrement d'une répétition
         function registerRep(rom) {
             repCount++;
             const repTime = (Date.now() - repStartTime) / 1000;
             const avgVel = velocities.reduce((a, b) => a + b, 0) / velocities.length;
             
-            // Enregistrer dans l'historique
             repHistory.push({
                 rep: repCount,
                 time: repTime,
@@ -757,139 +1216,277 @@
             });
             
             // Animation
-            elements.repCount.classList.add('rep-flash');
-            setTimeout(() => elements.repCount.classList.remove('rep-flash'), 300);
+            const counter = document.getElementById('repCount');
+            counter.classList.add('rep-flash');
+            setTimeout(() => counter.classList.remove('rep-flash'), 300);
             
-            // Mise à jour affichage
-            elements.repCount.textContent = repCount;
-            elements.repStatus.textContent = `Rep ${repCount} validée !`;
+            counter.textContent = repCount;
+            document.getElementById('repStatus').textContent = `Rep ${repCount} ✅`;
             
-            // Calculs statistiques
-            updateStats();
+            updateLiveStats();
             
-            // Feedback sonore (vibration si disponible)
-            if (navigator.vibrate) {
+            if (settings.vibration && navigator.vibrate) {
                 navigator.vibrate(100);
             }
             
-            showToast(`Rep ${repCount} validée ! 💪`, 'success');
+            showToast(`Rep ${repCount} ✅`, 'success');
         }
         
-        // Mise à jour des statistiques
-        function updateStats() {
+        function updateLiveStats() {
             if (repHistory.length === 0) return;
             
-            // Vitesse moyenne
-            const avgVelocity = repHistory.reduce((sum, rep) => sum + rep.velocity, 0) / repHistory.length;
-            elements.avgVelocity.textContent = (avgVelocity * 10).toFixed(2);
+            const avgVel = repHistory.reduce((s, r) => s + r.velocity, 0) / repHistory.length;
+            const avgROM = repHistory.reduce((s, r) => s + r.rom, 0) / repHistory.length;
+            const avgTempo = repHistory.reduce((s, r) => s + r.time, 0) / repHistory.length;
             
-            // ROM moyen
-            const avgROM = repHistory.reduce((sum, rep) => sum + rep.rom, 0) / repHistory.length;
-            elements.romValue.textContent = (avgROM * 100).toFixed(0);
-            
-            // Tempo moyen
-            const avgTempo = repHistory.reduce((sum, rep) => sum + rep.time, 0) / repHistory.length;
-            elements.tempoValue.textContent = avgTempo.toFixed(1);
-            
-            // Fatigue (baisse de vélocité)
             const firstVel = repHistory[0].velocity;
             const lastVel = repHistory[repHistory.length - 1].velocity;
             const fatigue = ((firstVel - lastVel) / firstVel) * 100;
-            elements.fatigueValue.textContent = Math.max(0, fatigue).toFixed(0);
             
-            // Qualité
-            updateQuality(avgVelocity, avgROM, fatigue);
+            document.getElementById('liveVelocity').textContent = (avgVel * 10).toFixed(2);
+            document.getElementById('liveROM').textContent = (avgROM * 100).toFixed(0);
+            document.getElementById('liveTempo').textContent = avgTempo.toFixed(1);
+            document.getElementById('liveFatigue').textContent = Math.max(0, fatigue).toFixed(0);
             
-            // Conseils
-            updateAdvice(avgVelocity, avgROM, fatigue);
-            
-            // Historique
-            updateHistory();
+            updateQuality(avgVel, avgROM, fatigue);
         }
         
-        // Qualité du mouvement
         function updateQuality(velocity, rom, fatigue) {
             let badges = [];
             
-            if (velocity > 0.5) {
-                badges.push('<div class="quality-badge good">Vitesse excellente</div>');
-            } else if (velocity > 0.3) {
-                badges.push('<div class="quality-badge warning">Vitesse correcte</div>');
-            } else {
-                badges.push('<div class="quality-badge bad">Vitesse faible</div>');
-            }
+            if (velocity > 0.5) badges.push('<div class="quality-badge good">Vitesse excellente</div>');
+            else if (velocity > 0.3) badges.push('<div class="quality-badge warning">Vitesse correcte</div>');
+            else badges.push('<div class="quality-badge bad">Vitesse faible</div>');
             
-            if (rom > 0.7) {
-                badges.push('<div class="quality-badge good">ROM complet</div>');
-            } else if (rom > 0.5) {
-                badges.push('<div class="quality-badge warning">ROM partiel</div>');
-            } else {
-                badges.push('<div class="quality-badge bad">ROM insuffisant</div>');
-            }
+            if (rom > 0.7) badges.push('<div class="quality-badge good">ROM complet</div>');
+            else if (rom > 0.5) badges.push('<div class="quality-badge warning">ROM partiel</div>');
+            else badges.push('<div class="quality-badge bad">ROM insuffisant</div>');
             
-            if (fatigue < 20) {
-                badges.push('<div class="quality-badge good">Forme maintenue</div>');
-            } else if (fatigue < 40) {
-                badges.push('<div class="quality-badge warning">Fatigue modérée</div>');
-            } else {
-                badges.push('<div class="quality-badge bad">Fatigue élevée</div>');
-            }
+            if (fatigue < 20) badges.push('<div class="quality-badge good">Forme OK</div>');
+            else if (fatigue < 40) badges.push('<div class="quality-badge warning">Fatigue modérée</div>');
+            else badges.push('<div class="quality-badge bad">Fatigue élevée</div>');
             
-            elements.qualityBadges.innerHTML = badges.join('');
+            document.getElementById('qualityBadges').innerHTML = badges.join('');
         }
         
-        // Conseils personnalisés
-        function updateAdvice(velocity, rom, fatigue) {
-            let advice = '';
-            
-            if (fatigue > 40) {
-                advice = '⚠️ Fatigue détectée. Pensez à arrêter la série pour éviter la blessure.';
-            } else if (rom < 0.5) {
-                advice = '📏 Amplitude incomplète. Essayez d\'aller plus bas pour un meilleur développement musculaire.';
-            } else if (velocity < 0.3) {
-                advice = '🐌 Vitesse faible. Augmentez l\'explosivité ou réduisez la charge.';
-            } else if (velocity > 0.7 && rom > 0.7 && fatigue < 20) {
-                advice = '🔥 Excellente forme ! Continuez comme ça !';
-            } else {
-                advice = '💪 Bonne série. Maintenez ce rythme et cette technique.';
+        function resetSet() {
+            // Save current set if it exists
+            if (repHistory.length > 0) {
+                const selectValue = document.getElementById('exerciseSelect').value;
+                const [group, exerciseName] = selectValue.split(':');
+                
+                sessionHistory.push({
+                    date: new Date().toISOString(),
+                    exercise: exerciseName,
+                    group: group,
+                    reps: repCount,
+                    history: [...repHistory]
+                });
+                
+                saveToLocalStorage();
             }
             
-            elements.adviceText.textContent = advice;
+            repCount = 0;
+            repHistory = [];
+            velocities = [];
+            previousZ = 1.0;
+            peakZ = 1.0;
+            valleyZ = 1.0;
+            movementPhase = 'neutral';
+            
+            document.getElementById('repCount').textContent = '0';
+            document.getElementById('repStatus').textContent = 'En attente...';
+            document.getElementById('liveVelocity').textContent = '0';
+            document.getElementById('liveROM').textContent = '0';
+            document.getElementById('liveTempo').textContent = '0';
+            document.getElementById('liveFatigue').textContent = '0';
+            document.getElementById('velocityFill').style.width = '0%';
+            document.getElementById('qualityBadges').innerHTML = '<div class="quality-badge good">En attente</div>';
         }
         
-        // Historique
-        function updateHistory() {
-            if (repHistory.length === 0) return;
+        // ============================================
+        // STATS PAGE
+        // ============================================
+        function updateStatsPage() {
+            if (sessionHistory.length === 0) {
+                document.getElementById('totalSets').textContent = '0';
+                document.getElementById('totalReps').textContent = '0';
+                document.getElementById('avgVelocityStat').textContent = '0';
+                document.getElementById('avgROMStat').textContent = '0';
+                return;
+            }
             
-            let html = '';
-            repHistory.forEach(rep => {
-                html += `
-                    <div class="history-item">
-                        <div>
-                            <span class="history-reps">Rep ${rep.rep}</span>
-                            <span style="color: var(--text-secondary); margin-left: 8px;">
-                                ${rep.time.toFixed(1)}s
-                            </span>
-                        </div>
-                        <div style="color: var(--text-secondary);">
-                            ${(rep.velocity * 10).toFixed(2)} m/s
-                        </div>
-                    </div>
-                `;
+            const totalSets = sessionHistory.length;
+            const totalReps = sessionHistory.reduce((sum, s) => sum + s.reps, 0);
+            
+            let allVelocities = [];
+            let allROMs = [];
+            
+            sessionHistory.forEach(session => {
+                session.history.forEach(rep => {
+                    allVelocities.push(rep.velocity);
+                    allROMs.push(rep.rom);
+                });
             });
             
-            elements.historyList.innerHTML = html;
+            const avgVel = allVelocities.reduce((a, b) => a + b, 0) / allVelocities.length;
+            const avgROM = allROMs.reduce((a, b) => a + b, 0) / allROMs.length;
+            
+            document.getElementById('totalSets').textContent = totalSets;
+            document.getElementById('totalReps').textContent = totalReps;
+            document.getElementById('avgVelocityStat').textContent = (avgVel * 10).toFixed(2);
+            document.getElementById('avgROMStat').textContent = (avgROM * 100).toFixed(0);
+            
+            renderCharts();
+            renderSessionHistory();
         }
         
-        // Event Listeners
-        elements.connectBtn.addEventListener('click', connect);
-        elements.disconnectBtn.addEventListener('click', disconnect);
-        elements.resetBtn.addEventListener('click', resetSet);
-        
-        // Vérification support
-        if (!navigator.bluetooth) {
-            showToast('⚠️ Ouvrez dans Chrome sur Android !', 'error');
+        function renderCharts() {
+            // Simple ASCII charts (you can integrate Chart.js later)
+            const velocityCanvas = document.getElementById('velocityChart');
+            const repsCanvas = document.getElementById('repsChart');
+            
+            velocityCanvas.innerHTML = '<div style="display: flex; align-items: flex-end; justify-content: space-around; height: 100%; padding: 20px;">';
+            repsCanvas.innerHTML = '<div style="display: flex; align-items: flex-end; justify-content: space-around; height: 100%; padding: 20px;">';
+            
+            const last10 = sessionHistory.slice(-10);
+            
+            last10.forEach((session, i) => {
+                const avgVel = session.history.reduce((s, r) => s + r.velocity, 0) / session.history.length;
+                const height = Math.min(100, (avgVel * 10) * 20);
+                
+                velocityCanvas.innerHTML += `<div style="width: 20px; height: ${height}%; background: var(--accent-primary); border-radius: 4px;"></div>`;
+                
+                const repHeight = Math.min(100, (session.reps / 20) * 100);
+                repsCanvas.innerHTML += `<div style="width: 20px; height: ${repHeight}%; background: var(--accent-blue); border-radius: 4px;"></div>`;
+            });
+            
+            velocityCanvas.innerHTML += '</div>';
+            repsCanvas.innerHTML += '</div>';
         }
+        
+        function renderSessionHistory() {
+            const container = document.getElementById('sessionHistoryList');
+            
+            if (sessionHistory.length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: var(--text-secondary); padding: 20px;">Aucune séance enregistrée</div>';
+                return;
+            }
+            
+            container.innerHTML = sessionHistory.slice(-10).reverse().map(session => {
+                const date = new Date(session.date);
+                return `
+                    <div class="history-item">
+                        <div>
+                            <div style="font-weight: 600;">${session.exercise}</div>
+                            <div class="history-date">${date.toLocaleDateString('fr-FR')} ${date.toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'})}</div>
+                        </div>
+                        <div class="history-reps">${session.reps} reps</div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // ============================================
+        // PROFILE PAGE
+        // ============================================
+        function addExercise() {
+            const name = document.getElementById('newExerciseName').value.trim();
+            const group = document.getElementById('newExerciseGroup').value;
+            const threshold = parseFloat(document.getElementById('newExerciseThreshold').value);
+            const minROM = parseInt(document.getElementById('newExerciseROM').value);
+            
+            if (!name) {
+                showToast('Entrez un nom d\'exercice', 'error');
+                return;
+            }
+            
+            exercises[group].push({ name, threshold, minROM });
+            saveToLocalStorage();
+            renderExerciseSelector();
+            renderMuscleGroups();
+            
+            document.getElementById('newExerciseName').value = '';
+            showToast('Exercice ajouté !', 'success');
+        }
+        
+        function deleteExercise(group, index) {
+            if (confirm('Supprimer cet exercice ?')) {
+                exercises[group].splice(index, 1);
+                saveToLocalStorage();
+                renderExerciseSelector();
+                renderMuscleGroups();
+                showToast('Exercice supprimé', 'success');
+            }
+        }
+        
+        function clearHistory() {
+            if (confirm('Effacer tout l\'historique ?')) {
+                sessionHistory = [];
+                saveToLocalStorage();
+                updateStatsPage();
+                showToast('Historique effacé', 'success');
+            }
+        }
+        
+        function applySettings() {
+            document.getElementById('toggleVibration').classList.toggle('active', settings.vibration);
+            document.getElementById('toggleSound').classList.toggle('active', settings.sound);
+            document.getElementById('toggleDarkMode').classList.toggle('active', settings.darkMode);
+        }
+        
+        // ============================================
+        // EVENT LISTENERS
+        // ============================================
+        function setupEventListeners() {
+            // Navigation
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', () => switchPage(item.dataset.page));
+            });
+            
+            // BLE
+            document.getElementById('connectBtn').addEventListener('click', connect);
+            document.getElementById('disconnectBtn').addEventListener('click', disconnect);
+            document.getElementById('resetBtn').addEventListener('click', resetSet);
+            
+            // Profile
+            document.getElementById('addExerciseBtn').addEventListener('click', addExercise);
+            document.getElementById('clearHistoryBtn').addEventListener('click', clearHistory);
+            
+            // Settings toggles
+            document.getElementById('toggleVibration').addEventListener('click', function() {
+                settings.vibration = !settings.vibration;
+                this.classList.toggle('active');
+                saveToLocalStorage();
+            });
+            
+            document.getElementById('toggleSound').addEventListener('click', function() {
+                settings.sound = !settings.sound;
+                this.classList.toggle('active');
+                saveToLocalStorage();
+            });
+            
+            document.getElementById('toggleDarkMode').addEventListener('click', function() {
+                settings.darkMode = !settings.darkMode;
+                this.classList.toggle('active');
+                saveToLocalStorage();
+            });
+        }
+        
+        // ============================================
+        // UTILITIES
+        // ============================================
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast show ${type}`;
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+        
+        // ============================================
+        // INIT
+        // ============================================
+        document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
