@@ -373,6 +373,35 @@
             margin-left: 2px;
         }
         
+        /* Manual counter controls */
+        .manual-controls {
+            display: flex;
+            gap: var(--space-sm);
+            justify-content: center;
+            margin-top: var(--space-md);
+        }
+        
+        .btn-counter {
+            width: 56px;
+            height: 56px;
+            border-radius: var(--radius-full);
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: var(--white-pure);
+            font-size: 32px;
+            font-weight: 300;
+            cursor: pointer;
+            transition: all var(--transition-base);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn-counter:active {
+            transform: scale(0.95);
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
         /* ============================================
            EXERCISE CARDS
            ============================================ */
@@ -807,7 +836,11 @@
                 Historique
             </button>
             
-            <button class="btn btn-secondary" id="btnDisconnect">
+            <button class="btn btn-secondary" id="btnConnectFromDashboard" style="display: none;">
+                Connecter RepSense
+            </button>
+            
+            <button class="btn btn-secondary" id="btnDisconnect" style="display: none;">
                 Déconnecter
             </button>
         </div>
@@ -840,6 +873,12 @@
                             <div class="stat-label">Moy.</div>
                             <div class="stat-value" id="avgVelocity">0<span class="stat-unit">m/s</span></div>
                         </div>
+                    </div>
+                    
+                    <!-- Manual controls (shown only if not connected) -->
+                    <div class="manual-controls" id="manualControls" style="display: none;">
+                        <button class="btn-counter" id="btnDecrement">−</button>
+                        <button class="btn-counter" id="btnIncrement">+</button>
                     </div>
                     
                     <button class="btn btn-secondary" id="btnFinishExercise">
@@ -1107,6 +1146,7 @@
             
             if (screenId === 'screenProfile') renderLibrary();
             if (screenId === 'screenHistory') renderHistory();
+            if (screenId === 'screenHome') updateConnectionUI();
         }
         
         function showModal(modalId) {
@@ -1173,12 +1213,25 @@
             const badge = document.getElementById('homeStatusBadge');
             const text = document.getElementById('homeStatusText');
             
+            // Update home screen badge
             if (state.isConnected) {
                 badge.classList.add('connected');
                 text.textContent = 'Connecté';
             } else {
                 badge.classList.remove('connected');
                 text.textContent = 'Non connecté';
+            }
+            
+            // Update dashboard buttons
+            const btnConnect = document.getElementById('btnConnectFromDashboard');
+            const btnDisconnect = document.getElementById('btnDisconnect');
+            
+            if (state.isConnected) {
+                btnConnect.style.display = 'none';
+                btnDisconnect.style.display = 'block';
+            } else {
+                btnConnect.style.display = 'block';
+                btnDisconnect.style.display = 'none';
             }
         }
         
@@ -1257,6 +1310,21 @@
             if (navigator.vibrate) {
                 navigator.vibrate(100);
             }
+        }
+        
+        // Manual rep controls
+        function incrementRep() {
+            if (!state.currentExercise) return;
+            state.currentExercise.reps++;
+            document.getElementById('currentReps').textContent = state.currentExercise.reps;
+            if (navigator.vibrate) navigator.vibrate(50);
+        }
+        
+        function decrementRep() {
+            if (!state.currentExercise || state.currentExercise.reps <= 0) return;
+            state.currentExercise.reps--;
+            document.getElementById('currentReps').textContent = state.currentExercise.reps;
+            if (navigator.vibrate) navigator.vibrate(30);
         }
         
         // ============================================
@@ -1449,6 +1517,13 @@
             document.getElementById('currentVelocity').innerHTML = '0<span class="stat-unit">m/s</span>';
             document.getElementById('avgVelocity').innerHTML = '0<span class="stat-unit">m/s</span>';
             document.getElementById('currentExerciseContainer').classList.remove('hidden');
+            
+            // Show manual controls if not connected
+            if (!state.isConnected) {
+                document.getElementById('manualControls').style.display = 'flex';
+            } else {
+                document.getElementById('manualControls').style.display = 'none';
+            }
             
             hideModal('modalSetWeight');
             document.getElementById('inputWeight').value = '';
@@ -1695,6 +1770,7 @@
         // EVENT LISTENERS
         // ============================================
         document.getElementById('btnConnect').addEventListener('click', connectBLE);
+        document.getElementById('btnConnectFromDashboard').addEventListener('click', connectBLE);
         document.getElementById('btnDisconnect').addEventListener('click', disconnectBLE);
         document.getElementById('btnStartSession').addEventListener('click', startSession);
         document.getElementById('btnViewHistory').addEventListener('click', () => showScreen('screenHistory'));
@@ -1702,6 +1778,10 @@
         document.getElementById('btnAddExercise').addEventListener('click', addExercise);
         document.getElementById('btnFinishExercise').addEventListener('click', finishExercise);
         document.getElementById('btnEndSession').addEventListener('click', endSession);
+        
+        // Manual controls
+        document.getElementById('btnIncrement').addEventListener('click', incrementRep);
+        document.getElementById('btnDecrement').addEventListener('click', decrementRep);
         
         // Library
         document.getElementById('btnAddToLibrary').addEventListener('click', addToLibrary);
@@ -1743,6 +1823,7 @@
         // INIT
         // ============================================
         loadData();
+        updateConnectionUI();
     </script>
 </body>
 </html>
