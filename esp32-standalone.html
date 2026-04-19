@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0a0e27">
+    <title>ESP32 BLE Monitor</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #151a35 100%);
+            color: #e8edf4;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: #151a35;
+            border: 1px solid #2a3254;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: #1e2544;
+            border-radius: 20px;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4a5578;
+        }
+        
+        .status.connected .status-dot {
+            background: #10b981;
+            box-shadow: 0 0 8px #10b981;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #00d9ff, #7c3aed);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+        
+        .btn:active {
+            transform: scale(0.98);
+        }
+        
+        .btn-disconnect {
+            background: #ef4444;
+        }
+        
+        .data-section {
+            background: #151a35;
+            border: 1px solid #2a3254;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .section-title {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #2a3254;
+        }
+        
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+        }
+        
+        .data-card {
+            background: #1e2544;
+            border: 1px solid #2a3254;
+            border-radius: 8px;
+            padding: 15px;
+        }
+        
+        .data-label {
+            font-size: 12px;
+            color: #8b95b0;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+        
+        .data-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #00d9ff;
+        }
+        
+        .data-unit {
+            font-size: 14px;
+            color: #4a5578;
+            margin-left: 4px;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            left: 20px;
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 15px 20px;
+            background: #151a35;
+            border: 1px solid #2a3254;
+            border-left: 4px solid #00d9ff;
+            border-radius: 8px;
+            color: white;
+            transform: translateY(-200px);
+            transition: transform 0.3s;
+            z-index: 1000;
+        }
+        
+        .toast.show {
+            transform: translateY(0);
+        }
+        
+        .toast.error {
+            border-left-color: #ef4444;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>ESP32 BLE Monitor</h1>
+            <div class="status" id="status">
+                <span class="status-dot"></span>
+                <span id="statusText">Déconnecté</span>
+            </div>
+        </div>
+        
+        <div id="connectSection">
+            <button class="btn" id="connectBtn">Connecter ESP32</button>
+        </div>
+        
+        <div id="connectedSection" class="hidden">
+            <div class="data-section">
+                <div class="section-title">Device</div>
+                <p id="deviceName">—</p>
+            </div>
+            <button class="btn btn-disconnect" id="disconnectBtn">Déconnecter</button>
+        </div>
+        
+        <div class="data-section">
+            <div class="section-title">Accéléromètre</div>
+            <div class="data-grid">
+                <div class="data-card">
+                    <div class="data-label">Axe X</div>
+                    <div class="data-value"><span id="ax">0.00</span><span class="data-unit">g</span></div>
+                </div>
+                <div class="data-card">
+                    <div class="data-label">Axe Y</div>
+                    <div class="data-value"><span id="ay">0.00</span><span class="data-unit">g</span></div>
+                </div>
+                <div class="data-card">
+                    <div class="data-label">Axe Z</div>
+                    <div class="data-value"><span id="az">0.00</span><span class="data-unit">g</span></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="data-section">
+            <div class="section-title">Gyroscope</div>
+            <div class="data-grid">
+                <div class="data-card">
+                    <div class="data-label">Rotation X</div>
+                    <div class="data-value"><span id="gx">0.00</span><span class="data-unit">°/s</span></div>
+                </div>
+                <div class="data-card">
+                    <div class="data-label">Rotation Y</div>
+                    <div class="data-value"><span id="gy">0.00</span><span class="data-unit">°/s</span></div>
+                </div>
+                <div class="data-card">
+                    <div class="data-label">Rotation Z</div>
+                    <div class="data-value"><span id="gz">0.00</span><span class="data-unit">°/s</span></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="data-section">
+            <div class="section-title">Température</div>
+            <div class="data-card">
+                <div class="data-value"><span id="temp">--</span><span class="data-unit">°C</span></div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="toast" id="toast"></div>
+    
+    <script>
+        const BLE_SERVICE_UUID = '4fafc201-1fb5-459e-8fcc-c5c9c331914b';
+        const BLE_CHARACTERISTIC_UUID = 'beb5483e-36e1-4688-b7f5-ea07361b26a8';
+        
+        let device = null;
+        let characteristic = null;
+        
+        const elements = {
+            connectBtn: document.getElementById('connectBtn'),
+            disconnectBtn: document.getElementById('disconnectBtn'),
+            status: document.getElementById('status'),
+            statusText: document.getElementById('statusText'),
+            deviceName: document.getElementById('deviceName'),
+            connectSection: document.getElementById('connectSection'),
+            connectedSection: document.getElementById('connectedSection'),
+            toast: document.getElementById('toast'),
+            ax: document.getElementById('ax'),
+            ay: document.getElementById('ay'),
+            az: document.getElementById('az'),
+            gx: document.getElementById('gx'),
+            gy: document.getElementById('gy'),
+            gz: document.getElementById('gz'),
+            temp: document.getElementById('temp')
+        };
+        
+        function showToast(message, isError = false) {
+            elements.toast.textContent = message;
+            elements.toast.className = 'toast show' + (isError ? ' error' : '');
+            setTimeout(() => elements.toast.classList.remove('show'), 3000);
+        }
+        
+        function updateUI(connected) {
+            if (connected) {
+                elements.status.classList.add('connected');
+                elements.statusText.textContent = 'Connecté';
+                elements.connectSection.classList.add('hidden');
+                elements.connectedSection.classList.remove('hidden');
+            } else {
+                elements.status.classList.remove('connected');
+                elements.statusText.textContent = 'Déconnecté';
+                elements.connectSection.classList.remove('hidden');
+                elements.connectedSection.classList.add('hidden');
+            }
+        }
+        
+        async function connect() {
+            if (!navigator.bluetooth) {
+                showToast('Web Bluetooth non supporté. Utilisez Chrome sur Android!', true);
+                return;
+            }
+            
+            try {
+                showToast('Recherche ESP32...');
+                
+                device = await navigator.bluetooth.requestDevice({
+                    filters: [{ name: 'ESP32' }],
+                    optionalServices: [BLE_SERVICE_UUID]
+                });
+                
+                showToast('Connexion...');
+                const server = await device.gatt.connect();
+                
+                const service = await server.getPrimaryService(BLE_SERVICE_UUID);
+                characteristic = await service.getCharacteristic(BLE_CHARACTERISTIC_UUID);
+                
+                await characteristic.startNotifications();
+                characteristic.addEventListener('characteristicvaluechanged', handleData);
+                
+                device.addEventListener('gattserverdisconnected', () => {
+                    updateUI(false);
+                    showToast('ESP32 déconnecté', true);
+                });
+                
+                elements.deviceName.textContent = device.name;
+                updateUI(true);
+                showToast('Connecté avec succès!');
+                
+            } catch (error) {
+                showToast('Erreur: ' + error.message, true);
+                console.error(error);
+            }
+        }
+        
+        function disconnect() {
+            if (device && device.gatt.connected) {
+                device.gatt.disconnect();
+            }
+            updateUI(false);
+        }
+        
+        function handleData(event) {
+            try {
+                const decoder = new TextDecoder('utf-8');
+                const jsonString = decoder.decode(event.target.value);
+                const data = JSON.parse(jsonString);
+                
+                if (data.ax !== undefined) elements.ax.textContent = data.ax.toFixed(2);
+                if (data.ay !== undefined) elements.ay.textContent = data.ay.toFixed(2);
+                if (data.az !== undefined) elements.az.textContent = data.az.toFixed(2);
+                if (data.gx !== undefined) elements.gx.textContent = data.gx.toFixed(1);
+                if (data.gy !== undefined) elements.gy.textContent = data.gy.toFixed(1);
+                if (data.gz !== undefined) elements.gz.textContent = data.gz.toFixed(1);
+                if (data.temp !== undefined) elements.temp.textContent = data.temp.toFixed(1);
+                
+            } catch (error) {
+                console.error('Erreur parsing:', error);
+            }
+        }
+        
+        elements.connectBtn.addEventListener('click', connect);
+        elements.disconnectBtn.addEventListener('click', disconnect);
+        
+        // Vérifier le support au chargement
+        if (!navigator.bluetooth) {
+            showToast('⚠️ Ouvrez cette page dans Chrome sur Android!', true);
+        }
+    </script>
+</body>
+</html>
