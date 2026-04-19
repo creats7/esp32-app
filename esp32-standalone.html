@@ -1628,7 +1628,9 @@
             
             container.innerHTML = state.sessions.slice().reverse().map((session, idx) => {
                 const date = new Date(session.date);
-                const minutes = Math.floor(session.duration / 60);
+                const hours = Math.floor(session.duration / 3600);
+                const minutes = Math.floor((session.duration % 3600) / 60);
+                const durationText = hours > 0 ? `${hours}H ${minutes}M` : `${minutes}M`;
                 const originalIndex = state.sessions.length - 1 - idx;
                 
                 return `
@@ -1644,7 +1646,7 @@
                             </div>
                             <div class="exercise-stat">
                                 <div class="exercise-stat-label">Durée</div>
-                                <div class="exercise-stat-value">${minutes}min</div>
+                                <div class="exercise-stat-value">${durationText}</div>
                             </div>
                             <div class="exercise-stat">
                                 <div class="exercise-stat-label">Exercices</div>
@@ -1676,66 +1678,120 @@
                 // Draw background
                 ctx.drawImage(img, 0, 0, 1080, 1920);
                 
-                // Dark overlay
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+                // Gradient overlay moderne (type Strava)
+                const gradient = ctx.createLinearGradient(0, 0, 0, 1920);
+                gradient.addColorStop(0, 'rgba(0, 0, 0, 0.7)');
+                gradient.addColorStop(0.5, 'rgba(0, 0, 0, 0.5)');
+                gradient.addColorStop(1, 'rgba(0, 0, 0, 0.8)');
+                ctx.fillStyle = gradient;
                 ctx.fillRect(0, 0, 1080, 1920);
                 
                 // Session data
                 const session = state.shareSession;
                 const date = new Date(session.date);
-                const minutes = Math.floor(session.duration / 60);
+                const hours = Math.floor(session.duration / 3600);
+                const minutes = Math.floor((session.duration % 3600) / 60);
+                const durationText = hours > 0 ? `${hours}H ${minutes}M` : `${minutes}M`;
                 
-                // Title
-                ctx.fillStyle = '#22c55e';
-                ctx.font = 'bold 80px sans-serif';
-                ctx.textAlign = 'center';
-                ctx.fillText('MA SÉANCE', 540, 300);
-                
-                // Date
-                ctx.fillStyle = '#ffffff';
-                ctx.font = '40px sans-serif';
-                ctx.fillText(date.toLocaleDateString('fr-FR'), 540, 400);
-                
-                // Stats - Total Reps
-                ctx.font = 'bold 120px sans-serif';
-                ctx.fillStyle = '#22c55e';
-                ctx.fillText(session.totalReps, 540, 650);
-                ctx.font = '50px sans-serif';
-                ctx.fillStyle = '#94a3b8';
-                ctx.fillText('RÉPÉTITIONS', 540, 730);
-                
-                // Duration
-                ctx.font = 'bold 120px sans-serif';
-                ctx.fillStyle = '#22c55e';
-                ctx.fillText(minutes, 540, 950);
-                ctx.font = '50px sans-serif';
-                ctx.fillStyle = '#94a3b8';
-                ctx.fillText('MINUTES', 540, 1030);
-                
-                // Exercises
-                ctx.font = 'bold 60px sans-serif';
-                ctx.fillStyle = '#ffffff';
-                ctx.fillText('EXERCICES', 540, 1200);
-                
-                ctx.font = '45px sans-serif';
+                // Top section - GymTrack branding
+                ctx.fillStyle = '#FFFFFF';
+                ctx.font = 'bold 50px sans-serif';
                 ctx.textAlign = 'left';
-                let y = 1300;
-                session.exercises.forEach(ex => {
-                    ctx.fillStyle = '#94a3b8';
-                    ctx.fillText(`• ${ex.name}`, 200, y);
-                    ctx.fillStyle = '#22c55e';
-                    ctx.textAlign = 'right';
-                    ctx.fillText(`${ex.weight}kg × ${ex.reps}`, 880, y);
-                    ctx.textAlign = 'left';
-                    y += 80;
-                    if (y > 1700) return; // Limit overflow
-                });
+                ctx.fillText('GYMTRACK', 80, 120);
                 
-                // Watermark
-                ctx.font = '35px sans-serif';
-                ctx.fillStyle = '#ffffff';
+                // Date - subtle
+                ctx.fillStyle = '#86868B';
+                ctx.font = '32px sans-serif';
+                ctx.fillText(date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }), 80, 180);
+                
+                // Main stats card - style Strava
+                const cardY = 300;
+                const cardHeight = 600;
+                
+                // Card background with slight gradient
+                const cardGradient = ctx.createLinearGradient(0, cardY, 0, cardY + cardHeight);
+                cardGradient.addColorStop(0, 'rgba(255, 255, 255, 0.12)');
+                cardGradient.addColorStop(1, 'rgba(255, 255, 255, 0.08)');
+                ctx.fillStyle = cardGradient;
+                ctx.roundRect(80, cardY, 920, cardHeight, 24);
+                ctx.fill();
+                
+                // Card border
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+                ctx.lineWidth = 2;
+                ctx.roundRect(80, cardY, 920, cardHeight, 24);
+                ctx.stroke();
+                
+                // Stats grid inside card
+                const statsY = cardY + 80;
+                
+                // Durée
+                ctx.fillStyle = '#FFFFFF';
+                ctx.font = 'bold 140px sans-serif';
                 ctx.textAlign = 'center';
-                ctx.fillText('GymTrack', 540, 1820);
+                ctx.fillText(durationText, 540, statsY + 120);
+                ctx.fillStyle = '#86868B';
+                ctx.font = '38px sans-serif';
+                ctx.fillText('DURÉE', 540, statsY + 170);
+                
+                // Reps & Exercices - côte à côte
+                const bottomStatsY = statsY + 320;
+                
+                // Reps
+                ctx.fillStyle = '#FFFFFF';
+                ctx.font = 'bold 100px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(session.totalReps, 310, bottomStatsY);
+                ctx.fillStyle = '#86868B';
+                ctx.font = '32px sans-serif';
+                ctx.fillText('RÉPÉTITIONS', 310, bottomStatsY + 50);
+                
+                // Exercices count
+                ctx.fillStyle = '#FFFFFF';
+                ctx.font = 'bold 100px sans-serif';
+                ctx.fillText(session.exercises.length, 770, bottomStatsY);
+                ctx.fillStyle = '#86868B';
+                ctx.font = '32px sans-serif';
+                ctx.fillText('EXERCICES', 770, bottomStatsY + 50);
+                
+                // Exercise details section
+                const detailsY = 1050;
+                ctx.fillStyle = '#FFFFFF';
+                ctx.font = 'bold 42px sans-serif';
+                ctx.textAlign = 'left';
+                ctx.fillText('DÉTAILS', 80, detailsY);
+                
+                // Exercise list with modern layout
+                ctx.font = '38px sans-serif';
+                let y = detailsY + 80;
+                const maxExercises = Math.min(session.exercises.length, 6);
+                
+                for (let i = 0; i < maxExercises; i++) {
+                    const ex = session.exercises[i];
+                    
+                    // Exercise name
+                    ctx.fillStyle = '#F5F5F7';
+                    ctx.textAlign = 'left';
+                    ctx.fillText(ex.name, 80, y);
+                    
+                    // Stats (weight × reps)
+                    ctx.fillStyle = '#86868B';
+                    ctx.textAlign = 'right';
+                    ctx.fillText(`${ex.weight}kg × ${ex.reps}`, 1000, y);
+                    
+                    y += 90;
+                }
+                
+                // Bottom branding bar
+                const barY = 1800;
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+                ctx.fillRect(0, barY, 1080, 120);
+                
+                // Logo + text
+                ctx.fillStyle = '#FFFFFF';
+                ctx.font = 'bold 40px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('GYMTRACK', 540, barY + 70);
                 
                 // Show preview
                 const preview = document.getElementById('sharePreview');
