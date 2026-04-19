@@ -3,234 +3,395 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#0f172a">
-    <title>Rep Tracker Pro</title>
+    <meta name="theme-color" content="#0B0B0B">
+    <title>GymTrack</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        /* ============================================
+           GYMTRACK - PREMIUM APPLE x GYMSHARK DESIGN
+           Zero compromises, pure elegance
+           ============================================ */
         
-        :root {
-            --bg-primary: #0f172a;
-            --bg-secondary: #1e293b;
-            --bg-tertiary: #334155;
-            --accent-primary: #22c55e;
-            --accent-secondary: #ef4444;
-            --accent-blue: #3b82f6;
-            --text-primary: #f1f5f9;
-            --text-secondary: #94a3b8;
-            --border-color: #475569;
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
         
+        :root {
+            /* Premium Dark Palette */
+            --black-pure: #000000;
+            --black-deep: #0B0B0B;
+            --black-card: #1A1A1A;
+            --black-elevated: #212121;
+            
+            /* White Scale */
+            --white-pure: #FFFFFF;
+            --white-primary: #F5F5F7;
+            --white-secondary: #86868B;
+            --white-tertiary: #48484A;
+            
+            /* Accent */
+            --accent: #FFFFFF;
+            --success: #30D158;
+            --error: #FF453A;
+            
+            /* Spacing System (8pt grid) */
+            --space-xs: 8px;
+            --space-sm: 12px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            --space-xl: 32px;
+            --space-2xl: 48px;
+            --space-3xl: 64px;
+            
+            /* Border Radius */
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --radius-full: 999px;
+            
+            /* Shadows */
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.5);
+            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.6);
+            
+            /* Transitions */
+            --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-base: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* ============================================
+           BASE
+           ============================================ */
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, var(--bg-primary), var(--bg-secondary));
-            color: var(--text-primary);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+            background: var(--black-deep);
+            color: var(--white-primary);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
             min-height: 100vh;
-            padding-bottom: 70px;
+            padding-bottom: 88px;
         }
         
         .container {
-            max-width: 600px;
+            max-width: 480px;
             margin: 0 auto;
-            padding: 20px;
+            padding: var(--space-lg);
         }
         
-        /* Screens */
+        /* ============================================
+           TYPOGRAPHY
+           ============================================ */
+        .title {
+            font-size: 34px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            color: var(--white-pure);
+            margin-bottom: var(--space-xs);
+        }
+        
+        .subtitle {
+            font-size: 15px;
+            font-weight: 400;
+            color: var(--white-secondary);
+            letter-spacing: -0.01em;
+        }
+        
+        /* ============================================
+           SCREENS
+           ============================================ */
         .screen {
             display: none;
+            animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
         
         .screen.active {
             display: block;
-            animation: fadeIn 0.3s ease;
         }
         
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
         
-        /* Header */
+        /* ============================================
+           HEADER
+           ============================================ */
         .header {
-            background: var(--bg-secondary);
-            border-radius: 16px;
-            padding: 24px;
-            margin-bottom: 20px;
-            border: 1px solid var(--border-color);
+            background: var(--black-card);
+            border-radius: var(--radius-xl);
+            padding: var(--space-xl) var(--space-lg);
+            margin-bottom: var(--space-xl);
+            border: 1px solid rgba(255, 255, 255, 0.06);
         }
         
-        .title {
-            font-size: 28px;
-            font-weight: 700;
-            background: linear-gradient(90deg, var(--accent-primary), var(--accent-blue));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 8px;
+        /* ============================================
+           STATUS BADGE
+           ============================================ */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-xs);
+            padding: 6px 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: var(--radius-full);
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--white-secondary);
+            margin-top: var(--space-md);
+            transition: all var(--transition-base);
         }
         
-        .subtitle {
-            color: var(--text-secondary);
-            font-size: 14px;
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--error);
+            transition: all var(--transition-base);
         }
         
-        /* Buttons */
+        .status-badge.connected {
+            background: rgba(48, 209, 88, 0.1);
+            border-color: rgba(48, 209, 88, 0.2);
+            color: var(--success);
+        }
+        
+        .status-badge.connected .status-dot {
+            background: var(--success);
+            box-shadow: 0 0 8px var(--success);
+        }
+        
+        /* ============================================
+           BUTTONS
+           ============================================ */
         .btn {
             width: 100%;
             min-height: 56px;
-            padding: 16px 24px;
+            padding: 0 var(--space-lg);
             border: none;
-            border-radius: 12px;
-            font-size: 16px;
+            border-radius: var(--radius-md);
+            font-size: 17px;
             font-weight: 600;
+            letter-spacing: -0.01em;
             cursor: pointer;
-            transition: all 0.2s;
-            margin-bottom: 12px;
+            transition: all var(--transition-base);
+            margin-bottom: var(--space-md);
+            position: relative;
+            overflow: hidden;
+            font-family: inherit;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        
+        .btn:active::before {
+            width: 300px;
+            height: 300px;
         }
         
         .btn-primary {
-            background: linear-gradient(135deg, var(--accent-primary), #16a34a);
-            color: white;
-            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+            background: var(--white-pure);
+            color: var(--black-deep);
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
         }
         
-        .btn-primary:active { transform: scale(0.98); }
+        .btn-primary:hover {
+            background: rgba(255, 255, 255, 0.95);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        }
+        
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
         
         .btn-secondary {
-            background: var(--bg-tertiary);
-            color: var(--text-primary);
-            border: 1px solid var(--border-color);
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--white-primary);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 255, 255, 0.18);
         }
         
         .btn-danger {
-            background: var(--accent-secondary);
-            color: white;
+            background: rgba(255, 69, 58, 0.15);
+            color: var(--error);
+            border: 1px solid rgba(255, 69, 58, 0.3);
+        }
+        
+        .btn-danger:hover {
+            background: rgba(255, 69, 58, 0.2);
         }
         
         .btn-small {
             min-height: 40px;
-            padding: 10px 16px;
-            font-size: 14px;
+            font-size: 15px;
+            padding: 0 var(--space-md);
         }
         
-        /* Status */
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
-            background: var(--bg-tertiary);
-            border-radius: 20px;
-            font-size: 13px;
-            margin-top: 12px;
-        }
-        
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--accent-secondary);
-        }
-        
-        .status-badge.connected .status-dot {
-            background: var(--accent-primary);
-            box-shadow: 0 0 8px var(--accent-primary);
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.6; }
-        }
-        
-        /* Session Timer */
+        /* ============================================
+           SESSION
+           ============================================ */
         .session-timer {
-            font-size: 48px;
-            font-weight: 700;
-            color: var(--accent-primary);
+            font-size: 56px;
+            font-weight: 300;
+            letter-spacing: -0.03em;
+            color: var(--white-pure);
             text-align: center;
-            margin: 20px 0;
+            margin: var(--space-lg) 0;
+            font-variant-numeric: tabular-nums;
         }
         
-        /* Current Exercise Display */
         .current-exercise-display {
-            background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(59, 130, 246, 0.1));
-            border: 2px solid var(--accent-primary);
-            border-radius: 16px;
-            padding: 24px;
-            margin-bottom: 16px;
+            background: linear-gradient(135deg, var(--black-card) 0%, var(--black-elevated) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: var(--radius-xl);
+            padding: var(--space-xl);
+            margin-bottom: var(--space-lg);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .current-exercise-display::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--white-pure), transparent);
+            opacity: 0.3;
         }
         
         .current-exercise-name {
-            font-size: 20px;
-            font-weight: 600;
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: var(--white-pure);
             text-align: center;
-            margin-bottom: 8px;
+            margin-bottom: var(--space-xs);
         }
         
         .current-exercise-weight {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--white-secondary);
             text-align: center;
-            color: var(--text-secondary);
-            margin-bottom: 16px;
+            margin-bottom: var(--space-lg);
         }
         
+        /* ============================================
+           STATS
+           ============================================ */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            margin-bottom: 16px;
+            gap: var(--space-sm);
+            margin-bottom: var(--space-lg);
         }
         
         .stat-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: var(--radius-md);
+            padding: var(--space-md);
             text-align: center;
-            padding: 16px;
-            background: var(--bg-secondary);
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
+            transition: all var(--transition-base);
+        }
+        
+        .stat-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateY(-2px);
         }
         
         .stat-label {
             font-size: 11px;
+            font-weight: 600;
             text-transform: uppercase;
-            color: var(--text-secondary);
-            margin-bottom: 6px;
+            letter-spacing: 0.05em;
+            color: var(--white-secondary);
+            margin-bottom: var(--space-xs);
         }
         
         .stat-value {
             font-size: 32px;
             font-weight: 700;
-            color: var(--accent-primary);
+            letter-spacing: -0.02em;
+            color: var(--white-pure);
+            font-variant-numeric: tabular-nums;
         }
         
         .stat-unit {
-            font-size: 14px;
-            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--white-secondary);
+            margin-left: 2px;
         }
         
-        /* Exercise List */
+        /* ============================================
+           EXERCISE CARDS
+           ============================================ */
         .exercise-card {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 12px;
+            background: var(--black-card);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            margin-bottom: var(--space-md);
+            transition: all var(--transition-base);
+        }
+        
+        .exercise-card:hover {
+            border-color: rgba(255, 255, 255, 0.12);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
         }
         
         .exercise-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 12px;
+            margin-bottom: var(--space-md);
         }
         
         .exercise-name {
-            font-size: 18px;
-            font-weight: 600;
+            font-size: 19px;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            color: var(--white-pure);
         }
         
         .exercise-stats {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            margin-top: 12px;
+            gap: var(--space-md);
+            margin-top: var(--space-md);
+            padding-top: var(--space-md);
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
         }
         
         .exercise-stat {
@@ -239,59 +400,95 @@
         
         .exercise-stat-label {
             font-size: 11px;
-            color: var(--text-secondary);
+            font-weight: 600;
             text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--white-secondary);
+            margin-bottom: 4px;
         }
         
         .exercise-stat-value {
             font-size: 20px;
             font-weight: 700;
-            color: var(--accent-primary);
+            color: var(--white-pure);
+            font-variant-numeric: tabular-nums;
         }
         
-        /* Library Items */
+        /* ============================================
+           LIBRARY
+           ============================================ */
         .library-item {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 12px;
+            background: var(--black-card);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: var(--radius-md);
+            padding: var(--space-md) var(--space-lg);
+            margin-bottom: var(--space-sm);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            transition: all var(--transition-base);
+        }
+        
+        .library-item:hover {
+            background: var(--black-elevated);
+            border-color: rgba(255, 255, 255, 0.12);
         }
         
         .library-item-name {
-            font-size: 16px;
-            font-weight: 500;
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--white-primary);
         }
         
-        /* Selection List */
+        /* ============================================
+           SELECTION
+           ============================================ */
         .selection-list {
-            max-height: 400px;
+            max-height: 420px;
             overflow-y: auto;
-            margin-bottom: 16px;
+            margin-bottom: var(--space-lg);
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .selection-list::-webkit-scrollbar {
+            width: 4px;
+        }
+        
+        .selection-list::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        .selection-list::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
         }
         
         .selection-item {
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 16px;
-            margin-bottom: 8px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: var(--radius-md);
+            padding: var(--space-lg);
+            margin-bottom: var(--space-sm);
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all var(--transition-fast);
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--white-primary);
         }
         
         .selection-item:hover {
-            border-color: var(--accent-primary);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.15);
+            transform: translateX(4px);
         }
         
         .selection-item:active {
             transform: scale(0.98);
         }
         
-        /* Modal */
+        /* ============================================
+           MODAL
+           ============================================ */
         .modal {
             display: none;
             position: fixed;
@@ -299,9 +496,10 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
             z-index: 1000;
-            padding: 20px;
+            padding: var(--space-lg);
             overflow-y: auto;
         }
         
@@ -309,64 +507,99 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            animation: modalFadeIn 0.2s ease;
+        }
+        
+        @keyframes modalFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
         
         .modal-content {
-            background: var(--bg-secondary);
-            border-radius: 16px;
-            padding: 24px;
-            max-width: 500px;
+            background: var(--black-card);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-xl);
+            padding: var(--space-xl);
+            max-width: 420px;
             width: 100%;
-            border: 1px solid var(--border-color);
             max-height: 90vh;
             overflow-y: auto;
+            animation: modalSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        @keyframes modalSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(24px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
         }
         
         .modal-title {
-            font-size: 20px;
-            font-weight: 600;
-            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: var(--white-pure);
+            margin-bottom: var(--space-xl);
         }
         
-        /* Form */
+        /* ============================================
+           FORMS
+           ============================================ */
         .form-group {
-            margin-bottom: 16px;
+            margin-bottom: var(--space-lg);
         }
         
         .form-label {
             display: block;
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 600;
-            margin-bottom: 8px;
-            color: var(--text-secondary);
+            color: var(--white-primary);
+            margin-bottom: var(--space-sm);
+            letter-spacing: -0.01em;
         }
         
         .form-input {
             width: 100%;
-            padding: 12px;
-            background: var(--bg-tertiary);
-            color: var(--text-primary);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            font-size: 16px;
+            padding: var(--space-md) var(--space-lg);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--white-pure);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-md);
+            font-size: 17px;
+            font-weight: 500;
+            font-family: inherit;
+            transition: all var(--transition-base);
+        }
+        
+        .form-input::placeholder {
+            color: var(--white-secondary);
         }
         
         .form-input:focus {
             outline: none;
-            border-color: var(--accent-primary);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--white-pure);
+            box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.05);
         }
         
-        /* Bottom Nav */
+        /* ============================================
+           BOTTOM NAV
+           ============================================ */
         .bottom-nav {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            background: var(--bg-secondary);
-            border-top: 1px solid var(--border-color);
+            background: rgba(26, 26, 26, 0.8);
+            backdrop-filter: blur(40px) saturate(180%);
+            border-top: 0.5px solid rgba(255, 255, 255, 0.1);
             display: flex;
             justify-content: space-around;
-            padding: 8px 0;
+            padding: var(--space-sm) 0 calc(var(--space-sm) + env(safe-area-inset-bottom));
             z-index: 100;
         }
         
@@ -375,43 +608,60 @@
             flex-direction: column;
             align-items: center;
             gap: 4px;
-            padding: 8px 16px;
+            padding: var(--space-sm) var(--space-lg);
             cursor: pointer;
-            color: var(--text-secondary);
-            transition: all 0.2s;
+            color: var(--white-secondary);
+            transition: all var(--transition-fast);
             background: none;
             border: none;
+            font-family: inherit;
+        }
+        
+        .nav-item:active {
+            transform: scale(0.95);
         }
         
         .nav-item.active {
-            color: var(--accent-primary);
+            color: var(--white-pure);
         }
         
         .nav-icon {
-            font-size: 24px;
+            font-size: 22px;
+            transition: transform var(--transition-fast);
+        }
+        
+        .nav-item.active .nav-icon {
+            transform: scale(1.1);
         }
         
         .nav-label {
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 600;
+            letter-spacing: 0.02em;
         }
         
+        /* ============================================
+           TOAST
+           ============================================ */
         .toast {
             position: fixed;
-            top: 20px;
-            left: 20px;
-            right: 20px;
+            top: var(--space-lg);
+            left: var(--space-lg);
+            right: var(--space-lg);
             max-width: 400px;
             margin: 0 auto;
-            padding: 16px 20px;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-left: 4px solid var(--accent-primary);
-            border-radius: 12px;
-            color: white;
-            transform: translateY(-200px);
-            transition: transform 0.3s;
+            padding: var(--space-md) var(--space-lg);
+            background: rgba(26, 26, 26, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: var(--radius-md);
+            color: var(--white-pure);
+            font-size: 15px;
+            font-weight: 500;
+            transform: translateY(-120px);
+            transition: transform var(--transition-slow);
             z-index: 2000;
+            box-shadow: var(--shadow-lg);
         }
         
         .toast.show {
@@ -419,11 +669,36 @@
         }
         
         .toast.error {
-            border-left-color: var(--accent-secondary);
+            border-color: var(--error);
+            background: rgba(255, 69, 58, 0.15);
         }
         
+        /* ============================================
+           UTILITIES
+           ============================================ */
         .hidden {
-            display: none;
+            display: none !important;
+        }
+        
+        /* ============================================
+           RESPONSIVE
+           ============================================ */
+        @media (max-width: 420px) {
+            .container {
+                padding: var(--space-md);
+            }
+            
+            .title {
+                font-size: 28px;
+            }
+            
+            .stats-grid {
+                gap: var(--space-xs);
+            }
+            
+            .stat-value {
+                font-size: 28px;
+            }
         }
     </style>
 </head>
@@ -434,7 +709,7 @@
              ============================================ -->
         <div id="screenHome" class="screen active">
             <div class="header">
-                <h1 class="title">💪 Rep Tracker</h1>
+                <h1 class="title">💪 GymTrack</h1>
                 <p class="subtitle">Musculation connectée</p>
                 <div class="status-badge" id="homeStatusBadge">
                     <span class="status-dot"></span>
@@ -587,6 +862,32 @@
         </div>
     </div>
     
+    <!-- Share Modal -->
+    <div id="modalShare" class="modal">
+        <div class="modal-content">
+            <h3 class="modal-title">📤 Partager ma séance</h3>
+            
+            <div class="form-group">
+                <label class="form-label">Choisir une image de fond</label>
+                <input type="file" class="form-input" id="inputShareImage" accept="image/*">
+            </div>
+            
+            <canvas id="shareCanvas" width="1080" height="1920" style="display: none;"></canvas>
+            
+            <div id="sharePreviewContainer" style="display: none;">
+                <img id="sharePreview" style="width: 100%; max-width: 400px; margin: 20px auto; display: block; border-radius: 12px;" alt="Preview">
+            </div>
+            
+            <button class="btn btn-primary" id="btnDownloadShare" style="display: none;">
+                💾 Télécharger l'image
+            </button>
+            
+            <button class="btn btn-secondary" id="btnCloseShare">
+                Fermer
+            </button>
+        </div>
+    </div>
+    
     <!-- Bottom Nav -->
     <nav class="bottom-nav">
         <button class="nav-item" data-screen="screenDashboard">
@@ -638,7 +939,10 @@
             velocities: [],
             
             // Selected exercise for adding
-            selectedExercise: null
+            selectedExercise: null,
+            
+            // Share
+            shareSession: null
         };
         
         // ============================================
@@ -1073,9 +1377,10 @@
                 return;
             }
             
-            container.innerHTML = state.sessions.slice().reverse().map(session => {
+            container.innerHTML = state.sessions.slice().reverse().map((session, idx) => {
                 const date = new Date(session.date);
                 const minutes = Math.floor(session.duration / 60);
+                const originalIndex = state.sessions.length - 1 - idx;
                 
                 return `
                     <div class="exercise-card">
@@ -1097,9 +1402,109 @@
                                 <div class="exercise-stat-value">${session.exercises.length}</div>
                             </div>
                         </div>
+                        <button class="btn btn-primary btn-small" onclick="openShareModal(${originalIndex})" style="margin-top: 12px;">
+                            📤 Partager
+                        </button>
                     </div>
                 `;
             }).join('');
+        }
+        
+        // ============================================
+        // SHARE STORY
+        // ============================================
+        function openShareModal(sessionIndex) {
+            state.shareSession = state.sessions[sessionIndex];
+            showModal('modalShare');
+        }
+        
+        function generateShareImage(backgroundImage) {
+            const canvas = document.getElementById('shareCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            const img = new Image();
+            img.onload = function() {
+                // Draw background
+                ctx.drawImage(img, 0, 0, 1080, 1920);
+                
+                // Dark overlay
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+                ctx.fillRect(0, 0, 1080, 1920);
+                
+                // Session data
+                const session = state.shareSession;
+                const date = new Date(session.date);
+                const minutes = Math.floor(session.duration / 60);
+                
+                // Title
+                ctx.fillStyle = '#22c55e';
+                ctx.font = 'bold 80px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('💪 MA SÉANCE', 540, 300);
+                
+                // Date
+                ctx.fillStyle = '#ffffff';
+                ctx.font = '40px sans-serif';
+                ctx.fillText(date.toLocaleDateString('fr-FR'), 540, 400);
+                
+                // Stats - Total Reps
+                ctx.font = 'bold 120px sans-serif';
+                ctx.fillStyle = '#22c55e';
+                ctx.fillText(session.totalReps, 540, 650);
+                ctx.font = '50px sans-serif';
+                ctx.fillStyle = '#94a3b8';
+                ctx.fillText('RÉPÉTITIONS', 540, 730);
+                
+                // Duration
+                ctx.font = 'bold 120px sans-serif';
+                ctx.fillStyle = '#22c55e';
+                ctx.fillText(minutes, 540, 950);
+                ctx.font = '50px sans-serif';
+                ctx.fillStyle = '#94a3b8';
+                ctx.fillText('MINUTES', 540, 1030);
+                
+                // Exercises
+                ctx.font = 'bold 60px sans-serif';
+                ctx.fillStyle = '#ffffff';
+                ctx.fillText('EXERCICES', 540, 1200);
+                
+                ctx.font = '45px sans-serif';
+                ctx.textAlign = 'left';
+                let y = 1300;
+                session.exercises.forEach(ex => {
+                    ctx.fillStyle = '#94a3b8';
+                    ctx.fillText(`• ${ex.name}`, 200, y);
+                    ctx.fillStyle = '#22c55e';
+                    ctx.textAlign = 'right';
+                    ctx.fillText(`${ex.weight}kg × ${ex.reps}`, 880, y);
+                    ctx.textAlign = 'left';
+                    y += 80;
+                    if (y > 1700) return; // Limit overflow
+                });
+                
+                // Watermark
+                ctx.font = '35px sans-serif';
+                ctx.fillStyle = '#ffffff';
+                ctx.textAlign = 'center';
+                ctx.fillText('GymTrack', 540, 1820);
+                
+                // Show preview
+                const preview = document.getElementById('sharePreview');
+                preview.src = canvas.toDataURL('image/jpeg', 0.9);
+                document.getElementById('sharePreviewContainer').style.display = 'block';
+                document.getElementById('btnDownloadShare').style.display = 'block';
+            };
+            img.src = backgroundImage;
+        }
+        
+        function downloadShareImage() {
+            const canvas = document.getElementById('shareCanvas');
+            const link = document.createElement('a');
+            link.download = `rep-tracker-${Date.now()}.jpg`;
+            link.href = canvas.toDataURL('image/jpeg', 0.9);
+            link.click();
+            
+            showToast('Image téléchargée !', 'success');
         }
         
         // ============================================
@@ -1141,6 +1546,25 @@
                     showScreen(item.dataset.screen);
                 }
             });
+        });
+        
+        // Share
+        document.getElementById('inputShareImage').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                generateShareImage(event.target.result);
+            };
+            reader.readAsDataURL(file);
+        });
+        document.getElementById('btnDownloadShare').addEventListener('click', downloadShareImage);
+        document.getElementById('btnCloseShare').addEventListener('click', () => {
+            hideModal('modalShare');
+            document.getElementById('sharePreviewContainer').style.display = 'none';
+            document.getElementById('btnDownloadShare').style.display = 'none';
+            document.getElementById('inputShareImage').value = '';
         });
         
         // ============================================
