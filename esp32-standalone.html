@@ -136,6 +136,25 @@
             border: 1px solid rgba(255, 255, 255, 0.06);
         }
         
+        .header-top {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            margin-bottom: var(--space-sm);
+        }
+        
+        .logo {
+            width: 32px;
+            height: 32px;
+            flex-shrink: 0;
+        }
+        
+        .logo svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        
         /* ============================================
            STATUS BADGE
            ============================================ */
@@ -628,10 +647,23 @@
         .nav-icon {
             font-size: 22px;
             transition: transform var(--transition-fast);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .nav-icon svg {
+            width: 22px;
+            height: 22px;
+            stroke-width: 2;
         }
         
         .nav-item.active .nav-icon {
             transform: scale(1.1);
+        }
+        
+        .nav-item.active .nav-icon svg {
+            stroke-width: 2.5;
         }
         
         .nav-label {
@@ -709,7 +741,17 @@
              ============================================ -->
         <div id="screenHome" class="screen active">
             <div class="header">
-                <h1 class="title">💪 GymTrack</h1>
+                <div class="header-top">
+                    <div class="logo">
+                        <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="32" height="32" rx="8" fill="white"/>
+                            <path d="M8 12h5v12H8V12zm11-4h5v16h-5V8z" fill="#0B0B0B"/>
+                            <circle cx="10.5" cy="9" r="2" fill="#0B0B0B"/>
+                            <circle cx="21.5" cy="5" r="2" fill="#0B0B0B"/>
+                        </svg>
+                    </div>
+                    <h1 class="title">GymTrack</h1>
+                </div>
                 <p class="subtitle">Musculation connectée</p>
                 <div class="status-badge" id="homeStatusBadge">
                     <span class="status-dot"></span>
@@ -718,7 +760,7 @@
             </div>
             
             <button class="btn btn-primary" id="btnConnect">
-                📡 Connecter le boîtier
+                Connecter le capteur
             </button>
         </div>
         
@@ -727,20 +769,30 @@
              ============================================ -->
         <div id="screenDashboard" class="screen">
             <div class="header">
-                <h1 class="title">📊 Dashboard</h1>
+                <div class="header-top">
+                    <div class="logo">
+                        <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="32" height="32" rx="8" fill="white"/>
+                            <path d="M8 12h5v12H8V12zm11-4h5v16h-5V8z" fill="#0B0B0B"/>
+                            <circle cx="10.5" cy="9" r="2" fill="#0B0B0B"/>
+                            <circle cx="21.5" cy="5" r="2" fill="#0B0B0B"/>
+                        </svg>
+                    </div>
+                    <h1 class="title">Dashboard</h1>
+                </div>
                 <p class="subtitle">Prêt à vous entraîner</p>
             </div>
             
             <button class="btn btn-primary" id="btnStartSession">
-                🏋️ Démarrer une séance
+                Démarrer une séance
             </button>
             
             <button class="btn btn-secondary" id="btnViewHistory">
-                📅 Historique
+                Historique
             </button>
             
             <button class="btn btn-secondary" id="btnDisconnect">
-                🔌 Déconnecter
+                Déconnecter
             </button>
         </div>
         
@@ -775,7 +827,7 @@
                     </div>
                     
                     <button class="btn btn-secondary" id="btnFinishExercise">
-                        ✅ Terminer l'exercice
+                        Terminer l'exercice
                     </button>
                 </div>
             </div>
@@ -784,11 +836,11 @@
             <div id="exerciseList"></div>
             
             <button class="btn btn-primary" id="btnAddExercise">
-                ➕ Ajouter un exercice
+                Ajouter un exercice
             </button>
             
             <button class="btn btn-danger" id="btnEndSession">
-                🏁 Terminer la séance
+                Terminer la séance
             </button>
         </div>
         
@@ -797,7 +849,17 @@
              ============================================ -->
         <div id="screenHistory" class="screen">
             <div class="header">
-                <h1 class="title">📅 Historique</h1>
+                <div class="header-top">
+                    <div class="logo">
+                        <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="32" height="32" rx="8" fill="white"/>
+                            <path d="M8 12h5v12H8V12zm11-4h5v16h-5V8z" fill="#0B0B0B"/>
+                            <circle cx="10.5" cy="9" r="2" fill="#0B0B0B"/>
+                            <circle cx="21.5" cy="5" r="2" fill="#0B0B0B"/>
+                        </svg>
+                    </div>
+                    <h1 class="title">Historique</h1>
+                </div>
             </div>
             
             <div id="historyList"></div>
@@ -812,14 +874,24 @@
              ============================================ -->
         <div id="screenProfile" class="screen">
             <div class="header">
-                <h1 class="title">⚙️ Mes exercices</h1>
+                <div class="header-top">
+                    <div class="logo">
+                        <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="32" height="32" rx="8" fill="white"/>
+                            <path d="M8 12h5v12H8V12zm11-4h5v16h-5V8z" fill="#0B0B0B"/>
+                            <circle cx="10.5" cy="9" r="2" fill="#0B0B0B"/>
+                            <circle cx="21.5" cy="5" r="2" fill="#0B0B0B"/>
+                        </svg>
+                    </div>
+                    <h1 class="title">Mes exercices</h1>
+                </div>
                 <p class="subtitle">Bibliothèque personnelle</p>
             </div>
             
             <div id="exerciseLibrary"></div>
             
             <button class="btn btn-primary" id="btnAddToLibrary">
-                ➕ Nouvel exercice
+                Nouvel exercice
             </button>
         </div>
     </div>
@@ -865,7 +937,7 @@
     <!-- Share Modal -->
     <div id="modalShare" class="modal">
         <div class="modal-content">
-            <h3 class="modal-title">📤 Partager ma séance</h3>
+            <h3 class="modal-title">Partager ma séance</h3>
             
             <div class="form-group">
                 <label class="form-label">Choisir une image de fond</label>
@@ -879,7 +951,7 @@
             </div>
             
             <button class="btn btn-primary" id="btnDownloadShare" style="display: none;">
-                💾 Télécharger l'image
+                Télécharger l'image
             </button>
             
             <button class="btn btn-secondary" id="btnCloseShare">
@@ -891,15 +963,36 @@
     <!-- Bottom Nav -->
     <nav class="bottom-nav">
         <button class="nav-item" data-screen="screenDashboard">
-            <div class="nav-icon">🏠</div>
+            <div class="nav-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+            </div>
             <div class="nav-label">Accueil</div>
         </button>
         <button class="nav-item" data-screen="screenHistory">
-            <div class="nav-icon">📊</div>
+            <div class="nav-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="2" x2="12" y2="6"></line>
+                    <line x1="12" y1="18" x2="12" y2="22"></line>
+                    <line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line>
+                    <line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line>
+                    <line x1="2" y1="12" x2="6" y2="12"></line>
+                    <line x1="18" y1="12" x2="22" y2="12"></line>
+                    <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line>
+                    <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line>
+                </svg>
+            </div>
             <div class="nav-label">Historique</div>
         </button>
         <button class="nav-item" data-screen="screenProfile">
-            <div class="nav-icon">⚙️</div>
+            <div class="nav-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M12 1v6m0 6v6m-6-6h6m6 0h6"></path>
+                </svg>
+            </div>
             <div class="nav-label">Exercices</div>
         </button>
     </nav>
@@ -1182,7 +1275,7 @@
             container.innerHTML = state.exercises.map(ex => `
                 <div class="library-item">
                     <div class="library-item-name">${ex.name}</div>
-                    <button class="btn btn-danger btn-small" onclick="deleteFromLibrary(${ex.id})">🗑️</button>
+                    <button class="btn btn-danger btn-small" onclick="deleteFromLibrary(${ex.id})">Supprimer</button>
                 </div>
             `).join('');
         }
@@ -1403,7 +1496,7 @@
                             </div>
                         </div>
                         <button class="btn btn-primary btn-small" onclick="openShareModal(${originalIndex})" style="margin-top: 12px;">
-                            📤 Partager
+                            Partager
                         </button>
                     </div>
                 `;
@@ -1440,7 +1533,7 @@
                 ctx.fillStyle = '#22c55e';
                 ctx.font = 'bold 80px sans-serif';
                 ctx.textAlign = 'center';
-                ctx.fillText('💪 MA SÉANCE', 540, 300);
+                ctx.fillText('MA SÉANCE', 540, 300);
                 
                 // Date
                 ctx.fillStyle = '#ffffff';
