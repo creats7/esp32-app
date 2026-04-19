@@ -144,8 +144,8 @@
         }
         
         .logo {
-            width: 32px;
-            height: 32px;
+            width: 64px;
+            height: 64px;
             flex-shrink: 0;
             color: var(--white-pure);
         }
@@ -437,6 +437,20 @@
         /* ============================================
            LIBRARY
            ============================================ */
+        .category-section {
+            margin-bottom: var(--space-xl);
+        }
+        
+        .category-title {
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--white-secondary);
+            margin-bottom: var(--space-md);
+            padding-left: 4px;
+        }
+        
         .library-item {
             background: var(--black-card);
             border: 1px solid rgba(255, 255, 255, 0.06);
@@ -754,7 +768,6 @@
                     </div>
                     <h1 class="title">GymTrack</h1>
                 </div>
-                <p class="subtitle">Musculation connectée</p>
                 <div class="status-badge" id="homeStatusBadge">
                     <span class="status-dot"></span>
                     <span id="homeStatusText">Non connecté</span>
@@ -762,7 +775,7 @@
             </div>
             
             <button class="btn btn-primary" id="btnConnect">
-                Connecter le capteur
+                Connecter RepSense
             </button>
         </div>
         
@@ -934,6 +947,19 @@
                 <label class="form-label">Nom de l'exercice</label>
                 <input type="text" class="form-input" id="inputLibraryName" placeholder="Ex: Curl biceps">
             </div>
+            <div class="form-group">
+                <label class="form-label">Groupe musculaire</label>
+                <select class="form-input" id="inputLibraryCategory">
+                    <option value="Pectoraux">Pectoraux</option>
+                    <option value="Dos">Dos</option>
+                    <option value="Épaules">Épaules</option>
+                    <option value="Biceps">Biceps</option>
+                    <option value="Triceps">Triceps</option>
+                    <option value="Jambes">Jambes</option>
+                    <option value="Abdos">Abdos</option>
+                    <option value="Cardio">Cardio</option>
+                </select>
+            </div>
             <button class="btn btn-primary" id="btnConfirmLibrary">Ajouter</button>
             <button class="btn btn-secondary" id="btnCancelLibrary">Annuler</button>
         </div>
@@ -1104,7 +1130,7 @@
                 showToast('Recherche...');
                 
                 state.device = await navigator.bluetooth.requestDevice({
-                    filters: [{ name: 'ESP32' }],
+                    filters: [{ name: 'RepSense' }],
                     optionalServices: [BLE_SERVICE_UUID]
                 });
                 
@@ -1242,6 +1268,7 @@
         
         function confirmAddLibrary() {
             const name = document.getElementById('inputLibraryName').value.trim();
+            const category = document.getElementById('inputLibraryCategory').value;
             
             if (!name) {
                 showToast('Entrez un nom', 'error');
@@ -1250,7 +1277,8 @@
             
             state.exercises.push({
                 id: Date.now(),
-                name: name
+                name: name,
+                category: category
             });
             
             saveData();
@@ -1273,16 +1301,37 @@
             const container = document.getElementById('exerciseLibrary');
             
             if (state.exercises.length === 0) {
-                container.innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 40px;">Aucun exercice. Ajoutez-en un !</p>';
+                container.innerHTML = '<p style="text-align: center; color: var(--white-secondary); padding: 40px;">Aucun exercice. Ajoutez-en un !</p>';
                 return;
             }
             
-            container.innerHTML = state.exercises.map(ex => `
-                <div class="library-item">
-                    <div class="library-item-name">${ex.name}</div>
-                    <button class="btn btn-danger btn-small" onclick="deleteFromLibrary(${ex.id})">Supprimer</button>
-                </div>
-            `).join('');
+            // Grouper par catégorie
+            const categories = {};
+            state.exercises.forEach(ex => {
+                const cat = ex.category || 'Autre';
+                if (!categories[cat]) categories[cat] = [];
+                categories[cat].push(ex);
+            });
+            
+            // Ordre des catégories
+            const order = ['Pectoraux', 'Dos', 'Épaules', 'Biceps', 'Triceps', 'Jambes', 'Abdos', 'Cardio', 'Autre'];
+            
+            let html = '';
+            order.forEach(cat => {
+                if (categories[cat]) {
+                    html += `<div class="category-section">
+                        <div class="category-title">${cat}</div>
+                        ${categories[cat].map(ex => `
+                            <div class="library-item">
+                                <div class="library-item-name">${ex.name}</div>
+                                <button class="btn btn-danger btn-small" onclick="deleteFromLibrary(${ex.id})">Supprimer</button>
+                            </div>
+                        `).join('')}
+                    </div>`;
+                }
+            });
+            
+            container.innerHTML = html;
         }
         
         // ============================================
@@ -1291,6 +1340,11 @@
         let sessionTimerInterval = null;
         
         function startSession() {
+            // Avertir si pas connecté
+            if (!state.isConnected) {
+                showToast('RepSense non connecté - comptage manuel uniquement', 'error');
+            }
+            
             state.currentSession = {
                 startTime: Date.now(),
                 exercises: [],
@@ -1321,11 +1375,33 @@
         
         function renderExerciseSelection() {
             const container = document.getElementById('exerciseSelectionList');
-            container.innerHTML = state.exercises.map(ex => `
-                <div class="selection-item" onclick="selectExercise(${ex.id})">
-                    ${ex.name}
-                </div>
-            `).join('');
+            
+            // Grouper par catégorie
+            const categories = {};
+            state.exercises.forEach(ex => {
+                const cat = ex.category || 'Autre';
+                if (!categories[cat]) categories[cat] = [];
+                categories[cat].push(ex);
+            });
+            
+            // Ordre des catégories
+            const order = ['Pectoraux', 'Dos', 'Épaules', 'Biceps', 'Triceps', 'Jambes', 'Abdos', 'Cardio', 'Autre'];
+            
+            let html = '';
+            order.forEach(cat => {
+                if (categories[cat]) {
+                    html += `<div class="category-section">
+                        <div class="category-title">${cat}</div>
+                        ${categories[cat].map(ex => `
+                            <div class="selection-item" onclick="selectExercise(${ex.id})">
+                                ${ex.name}
+                            </div>
+                        `).join('')}
+                    </div>`;
+                }
+            });
+            
+            container.innerHTML = html;
         }
         
         function selectExercise(id) {
@@ -1640,9 +1716,7 @@
         // Bottom nav
         document.querySelectorAll('.nav-item').forEach(item => {
             item.addEventListener('click', () => {
-                if (state.isConnected) {
-                    showScreen(item.dataset.screen);
-                }
+                showScreen(item.dataset.screen);
             });
         });
         
