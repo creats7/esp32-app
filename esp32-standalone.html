@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#0f172a">
-    <title>Rep Tracker - Musculation Connectée</title>
+    <title>Rep Tracker Pro</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -14,6 +14,7 @@
             --bg-tertiary: #334155;
             --accent-primary: #22c55e;
             --accent-secondary: #ef4444;
+            --accent-blue: #3b82f6;
             --text-primary: #f1f5f9;
             --text-secondary: #94a3b8;
             --border-color: #475569;
@@ -24,6 +25,7 @@
             background: linear-gradient(135deg, var(--bg-primary), var(--bg-secondary));
             color: var(--text-primary);
             min-height: 100vh;
+            padding-bottom: 70px;
         }
         
         .container {
@@ -32,9 +34,7 @@
             padding: 20px;
         }
         
-        /* ============================================
-           SCREENS (each screen = display: none by default)
-           ============================================ */
+        /* Screens */
         .screen {
             display: none;
         }
@@ -49,9 +49,7 @@
             to { opacity: 1; transform: translateY(0); }
         }
         
-        /* ============================================
-           COMMON COMPONENTS
-           ============================================ */
+        /* Header */
         .header {
             background: var(--bg-secondary);
             border-radius: 16px;
@@ -63,7 +61,7 @@
         .title {
             font-size: 28px;
             font-weight: 700;
-            background: linear-gradient(90deg, var(--accent-primary), #3b82f6);
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-blue));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin-bottom: 8px;
@@ -74,6 +72,7 @@
             font-size: 14px;
         }
         
+        /* Buttons */
         .btn {
             width: 100%;
             min-height: 56px;
@@ -106,6 +105,13 @@
             color: white;
         }
         
+        .btn-small {
+            min-height: 40px;
+            padding: 10px 16px;
+            font-size: 14px;
+        }
+        
+        /* Status */
         .status-badge {
             display: inline-flex;
             align-items: center;
@@ -135,17 +141,7 @@
             50% { opacity: 0.6; }
         }
         
-        /* ============================================
-           SCREEN: ACTIVE SESSION
-           ============================================ */
-        .session-header {
-            background: var(--bg-secondary);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 16px;
-            border: 1px solid var(--border-color);
-        }
-        
+        /* Session Timer */
         .session-timer {
             font-size: 48px;
             font-weight: 700;
@@ -154,38 +150,48 @@
             margin: 20px 0;
         }
         
-        .exercise-list {
-            margin-bottom: 20px;
+        /* Current Exercise Display */
+        .current-exercise-display {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(59, 130, 246, 0.1));
+            border: 2px solid var(--accent-primary);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 16px;
         }
         
-        .exercise-card {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 12px;
-        }
-        
-        .exercise-name {
-            font-size: 18px;
+        .current-exercise-name {
+            font-size: 20px;
             font-weight: 600;
-            margin-bottom: 12px;
+            text-align: center;
+            margin-bottom: 8px;
         }
         
-        .exercise-stats {
-            display: flex;
-            gap: 20px;
+        .current-exercise-weight {
+            text-align: center;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
         }
         
-        .stat {
-            flex: 1;
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: 16px;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
         }
         
         .stat-label {
-            font-size: 12px;
-            color: var(--text-secondary);
+            font-size: 11px;
             text-transform: uppercase;
-            margin-bottom: 4px;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
         }
         
         .stat-value {
@@ -194,79 +200,98 @@
             color: var(--accent-primary);
         }
         
-        .current-exercise-counter {
-            background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(59, 130, 246, 0.1));
-            border: 2px solid var(--accent-primary);
-            border-radius: 16px;
-            padding: 32px;
-            text-align: center;
-            margin-bottom: 16px;
-        }
-        
-        .counter-label {
+        .stat-unit {
             font-size: 14px;
             color: var(--text-secondary);
-            margin-bottom: 8px;
         }
         
-        .counter-value {
-            font-size: 72px;
-            font-weight: 700;
-            color: var(--accent-primary);
-        }
-        
-        /* ============================================
-           SCREEN: HISTORY
-           ============================================ */
-        .session-item {
+        /* Exercise List */
+        .exercise-card {
             background: var(--bg-secondary);
             border: 1px solid var(--border-color);
             border-radius: 12px;
             padding: 20px;
             margin-bottom: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
         }
         
-        .session-item:active {
-            transform: scale(0.98);
-        }
-        
-        .session-date {
-            font-size: 14px;
-            color: var(--text-secondary);
-            margin-bottom: 8px;
-        }
-        
-        .session-summary {
+        .exercise-header {
             display: flex;
-            gap: 20px;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .exercise-name {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .exercise-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
             margin-top: 12px;
         }
         
-        .summary-stat {
-            flex: 1;
+        .exercise-stat {
             text-align: center;
-            padding: 12px;
-            background: var(--bg-tertiary);
-            border-radius: 8px;
         }
         
-        .summary-value {
-            font-size: 24px;
+        .exercise-stat-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+        
+        .exercise-stat-value {
+            font-size: 20px;
             font-weight: 700;
             color: var(--accent-primary);
         }
         
-        .summary-label {
-            font-size: 12px;
-            color: var(--text-secondary);
-            margin-top: 4px;
+        /* Library Items */
+        .library-item {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         
-        /* ============================================
-           MODAL
-           ============================================ */
+        .library-item-name {
+            font-size: 16px;
+            font-weight: 500;
+        }
+        
+        /* Selection List */
+        .selection-list {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: 16px;
+        }
+        
+        .selection-item {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .selection-item:hover {
+            border-color: var(--accent-primary);
+        }
+        
+        .selection-item:active {
+            transform: scale(0.98);
+        }
+        
+        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -293,6 +318,8 @@
             max-width: 500px;
             width: 100%;
             border: 1px solid var(--border-color);
+            max-height: 90vh;
+            overflow-y: auto;
         }
         
         .modal-title {
@@ -301,6 +328,7 @@
             margin-bottom: 20px;
         }
         
+        /* Form */
         .form-group {
             margin-bottom: 16px;
         }
@@ -323,19 +351,49 @@
             font-size: 16px;
         }
         
-        /* ============================================
-           SHARE CANVAS
-           ============================================ */
-        #shareCanvas {
-            display: none;
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
         }
         
-        .share-preview {
-            width: 100%;
-            max-width: 400px;
-            margin: 20px auto;
-            border-radius: 12px;
-            overflow: hidden;
+        /* Bottom Nav */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0;
+            z-index: 100;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 8px 16px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+            background: none;
+            border: none;
+        }
+        
+        .nav-item.active {
+            color: var(--accent-primary);
+        }
+        
+        .nav-icon {
+            font-size: 24px;
+        }
+        
+        .nav-label {
+            font-size: 11px;
+            font-weight: 600;
         }
         
         .toast {
@@ -363,17 +421,21 @@
         .toast.error {
             border-left-color: var(--accent-secondary);
         }
+        
+        .hidden {
+            display: none;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <!-- ============================================
-             SCREEN 1: HOME
+             SCREEN: HOME
              ============================================ -->
         <div id="screenHome" class="screen active">
             <div class="header">
                 <h1 class="title">💪 Rep Tracker</h1>
-                <p class="subtitle">Votre coach musculation connecté</p>
+                <p class="subtitle">Musculation connectée</p>
                 <div class="status-badge" id="homeStatusBadge">
                     <span class="status-dot"></span>
                     <span id="homeStatusText">Non connecté</span>
@@ -386,7 +448,7 @@
         </div>
         
         <!-- ============================================
-             SCREEN 2: DASHBOARD
+             SCREEN: DASHBOARD
              ============================================ -->
         <div id="screenDashboard" class="screen">
             <div class="header">
@@ -399,7 +461,7 @@
             </button>
             
             <button class="btn btn-secondary" id="btnViewHistory">
-                📅 Voir mes séances
+                📅 Historique
             </button>
             
             <button class="btn btn-secondary" id="btnDisconnect">
@@ -408,30 +470,43 @@
         </div>
         
         <!-- ============================================
-             SCREEN 3: ACTIVE SESSION
+             SCREEN: SESSION
              ============================================ -->
         <div id="screenSession" class="screen">
-            <div class="session-header">
-                <h2 class="title">Séance en cours</h2>
+            <div class="header">
+                <h2 class="title" style="font-size: 20px;">Séance en cours</h2>
                 <div class="session-timer" id="sessionTimer">00:00</div>
             </div>
             
-            <!-- Current exercise counter -->
-            <div id="currentExerciseContainer" style="display: none;">
-                <div class="current-exercise-counter">
-                    <div class="counter-label">Répétitions</div>
-                    <div class="counter-value" id="currentRepCount">0</div>
+            <!-- Current Exercise -->
+            <div id="currentExerciseContainer" class="hidden">
+                <div class="current-exercise-display">
+                    <div class="current-exercise-name" id="currentExerciseName">—</div>
+                    <div class="current-exercise-weight" id="currentExerciseWeight">—</div>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-label">Reps</div>
+                            <div class="stat-value" id="currentReps">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Vitesse</div>
+                            <div class="stat-value" id="currentVelocity">0<span class="stat-unit">m/s</span></div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Moy.</div>
+                            <div class="stat-value" id="avgVelocity">0<span class="stat-unit">m/s</span></div>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-secondary" id="btnFinishExercise">
+                        ✅ Terminer l'exercice
+                    </button>
                 </div>
-                
-                <button class="btn btn-secondary" id="btnFinishExercise">
-                    ✅ Terminer l'exercice
-                </button>
             </div>
             
-            <!-- Exercise list -->
-            <div class="exercise-list" id="exerciseList">
-                <!-- Populated dynamically -->
-            </div>
+            <!-- Exercise List -->
+            <div id="exerciseList"></div>
             
             <button class="btn btn-primary" id="btnAddExercise">
                 ➕ Ajouter un exercice
@@ -443,118 +518,167 @@
         </div>
         
         <!-- ============================================
-             SCREEN 4: HISTORY
+             SCREEN: HISTORY
              ============================================ -->
         <div id="screenHistory" class="screen">
             <div class="header">
                 <h1 class="title">📅 Historique</h1>
-                <p class="subtitle">Vos séances passées</p>
             </div>
             
-            <div id="historyList">
-                <!-- Populated dynamically -->
-            </div>
+            <div id="historyList"></div>
             
-            <button class="btn btn-secondary" id="btnBackToDashboard">
+            <button class="btn btn-secondary" id="btnBackFromHistory">
                 ← Retour
             </button>
         </div>
         
         <!-- ============================================
-             MODALS
+             SCREEN: PROFILE
              ============================================ -->
-        <!-- Add Exercise Modal -->
-        <div id="modalAddExercise" class="modal">
-            <div class="modal-content">
-                <h3 class="modal-title">➕ Nouvel exercice</h3>
-                <div class="form-group">
-                    <label class="form-label">Nom de l'exercice</label>
-                    <input type="text" class="form-input" id="inputExerciseName" placeholder="Ex: Développé couché">
-                </div>
-                <button class="btn btn-primary" id="btnConfirmAddExercise">
-                    Démarrer
-                </button>
-                <button class="btn btn-secondary" id="btnCancelAddExercise">
-                    Annuler
-                </button>
+        <div id="screenProfile" class="screen">
+            <div class="header">
+                <h1 class="title">⚙️ Mes exercices</h1>
+                <p class="subtitle">Bibliothèque personnelle</p>
             </div>
-        </div>
-        
-        <!-- Share Modal -->
-        <div id="modalShare" class="modal">
-            <div class="modal-content">
-                <h3 class="modal-title">📤 Partager ma séance</h3>
-                
-                <div class="form-group">
-                    <label class="form-label">Choisir une image de fond</label>
-                    <input type="file" class="form-input" id="inputShareImage" accept="image/*">
-                </div>
-                
-                <canvas id="shareCanvas" width="1080" height="1920"></canvas>
-                
-                <div id="sharePreviewContainer" style="display: none;">
-                    <img id="sharePreview" class="share-preview" alt="Preview">
-                </div>
-                
-                <button class="btn btn-primary" id="btnDownloadShare" style="display: none;">
-                    💾 Télécharger
-                </button>
-                
-                <button class="btn btn-secondary" id="btnCloseShare">
-                    Fermer
-                </button>
-            </div>
+            
+            <div id="exerciseLibrary"></div>
+            
+            <button class="btn btn-primary" id="btnAddToLibrary">
+                ➕ Nouvel exercice
+            </button>
         </div>
     </div>
     
-    <!-- Toast -->
+    <!-- ============================================
+         MODALS
+         ============================================ -->
+    <!-- Select Exercise -->
+    <div id="modalSelectExercise" class="modal">
+        <div class="modal-content">
+            <h3 class="modal-title">Choisir un exercice</h3>
+            <div class="selection-list" id="exerciseSelectionList"></div>
+            <button class="btn btn-secondary" id="btnCancelSelect">Annuler</button>
+        </div>
+    </div>
+    
+    <!-- Set Weight -->
+    <div id="modalSetWeight" class="modal">
+        <div class="modal-content">
+            <h3 class="modal-title" id="modalWeightTitle">Poids</h3>
+            <div class="form-group">
+                <label class="form-label">Poids (kg)</label>
+                <input type="number" class="form-input" id="inputWeight" placeholder="Ex: 20" step="0.5" min="0">
+            </div>
+            <button class="btn btn-primary" id="btnConfirmWeight">Démarrer</button>
+            <button class="btn btn-secondary" id="btnCancelWeight">Annuler</button>
+        </div>
+    </div>
+    
+    <!-- Add to Library -->
+    <div id="modalAddLibrary" class="modal">
+        <div class="modal-content">
+            <h3 class="modal-title">Nouvel exercice</h3>
+            <div class="form-group">
+                <label class="form-label">Nom de l'exercice</label>
+                <input type="text" class="form-input" id="inputLibraryName" placeholder="Ex: Curl biceps">
+            </div>
+            <button class="btn btn-primary" id="btnConfirmLibrary">Ajouter</button>
+            <button class="btn btn-secondary" id="btnCancelLibrary">Annuler</button>
+        </div>
+    </div>
+    
+    <!-- Bottom Nav -->
+    <nav class="bottom-nav">
+        <button class="nav-item" data-screen="screenDashboard">
+            <div class="nav-icon">🏠</div>
+            <div class="nav-label">Accueil</div>
+        </button>
+        <button class="nav-item" data-screen="screenHistory">
+            <div class="nav-icon">📊</div>
+            <div class="nav-label">Historique</div>
+        </button>
+        <button class="nav-item" data-screen="screenProfile">
+            <div class="nav-icon">⚙️</div>
+            <div class="nav-label">Exercices</div>
+        </button>
+    </nav>
+    
     <div class="toast" id="toast"></div>
     
     <script>
         // ============================================
-        // CONFIGURATION BLE (TON CODE EXISTANT)
+        // CONFIG BLE
         // ============================================
         const BLE_SERVICE_UUID = '4fafc201-1fb5-459e-8fcc-c5c9c331914b';
         const BLE_CHARACTERISTIC_UUID = 'beb5483e-36e1-4688-b7f5-ea07361b26a8';
         
         // ============================================
-        // STATE MANAGEMENT
+        // STATE
         // ============================================
         const state = {
+            // BLE
             isConnected: false,
             device: null,
             characteristic: null,
+            
+            // Library
+            exercises: [],
+            
+            // Session
             currentSession: null,
             currentExercise: null,
             sessions: [],
             
-            // Movement detection (TON CODE EXISTANT)
+            // Detection
             previousZ: 1.0,
             peakZ: 1.0,
             valleyZ: 1.0,
             movementPhase: 'neutral',
             repStartTime: 0,
-            velocities: []
+            velocities: [],
+            
+            // Selected exercise for adding
+            selectedExercise: null
         };
         
         // ============================================
-        // LOAD/SAVE
+        // VELOCITY CALCULATION
         // ============================================
-        function loadSessions() {
-            const saved = localStorage.getItem('reptracker_sessions');
-            state.sessions = saved ? JSON.parse(saved) : [];
-        }
-        
-        function saveSessions() {
-            localStorage.setItem('reptracker_sessions', JSON.stringify(state.sessions));
+        function calculateVelocity(sensorData) {
+            const currentZ = sensorData.az;
+            const velocity = Math.abs(currentZ - state.previousZ) * 10; // m/s approximation
+            return velocity;
         }
         
         // ============================================
-        // SCREEN NAVIGATION
+        // STORAGE
+        // ============================================
+        function loadData() {
+            const savedExercises = localStorage.getItem('rt_exercises');
+            state.exercises = savedExercises ? JSON.parse(savedExercises) : [];
+            
+            const savedSessions = localStorage.getItem('rt_sessions');
+            state.sessions = savedSessions ? JSON.parse(savedSessions) : [];
+        }
+        
+        function saveData() {
+            localStorage.setItem('rt_exercises', JSON.stringify(state.exercises));
+            localStorage.setItem('rt_sessions', JSON.stringify(state.sessions));
+        }
+        
+        // ============================================
+        // NAVIGATION
         // ============================================
         function showScreen(screenId) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            
             document.getElementById(screenId).classList.add('active');
+            const navItem = document.querySelector(`[data-screen="${screenId}"]`);
+            if (navItem) navItem.classList.add('active');
+            
+            if (screenId === 'screenProfile') renderLibrary();
+            if (screenId === 'screenHistory') renderHistory();
         }
         
         function showModal(modalId) {
@@ -566,7 +690,7 @@
         }
         
         // ============================================
-        // BLE CONNECTION (TON CODE EXISTANT - CONSERVÉ)
+        // BLE
         // ============================================
         async function connectBLE() {
             if (!navigator.bluetooth) {
@@ -630,17 +754,20 @@
             }
         }
         
-        // ============================================
-        // BLE DATA HANDLING (TON ALGORITHME EXISTANT)
-        // ============================================
         function handleBLEData(event) {
             try {
                 const decoder = new TextDecoder('utf-8');
                 const jsonString = decoder.decode(event.target.value);
                 const data = JSON.parse(jsonString);
                 
-                // Si on a un exercice en cours, détecter les reps
                 if (state.currentExercise) {
+                    const velocity = calculateVelocity(data);
+                    state.currentExercise.velocities.push(velocity);
+                    
+                    // Update UI
+                    updateVelocityDisplay(velocity);
+                    
+                    // Detect rep
                     detectRep(data);
                 }
                 
@@ -649,17 +776,20 @@
             }
         }
         
-        // TON ALGORITHME DE DÉTECTION (CONSERVÉ)
+        function updateVelocityDisplay(currentVelocity) {
+            document.getElementById('currentVelocity').innerHTML = currentVelocity.toFixed(2) + '<span class="stat-unit">m/s</span>';
+            
+            if (state.currentExercise.velocities.length > 0) {
+                const avg = state.currentExercise.velocities.reduce((a, b) => a + b, 0) / state.currentExercise.velocities.length;
+                document.getElementById('avgVelocity').innerHTML = avg.toFixed(2) + '<span class="stat-unit">m/s</span>';
+            }
+        }
+        
         function detectRep(data) {
             const currentZ = data.az;
-            const threshold = 0.3; // Configurable
+            const threshold = 0.3;
             const minROM = 0.5;
             
-            const velocity = Math.abs(currentZ - state.previousZ);
-            state.velocities.push(velocity);
-            if (state.velocities.length > 10) state.velocities.shift();
-            
-            // State machine (TON CODE)
             if (state.movementPhase === 'neutral') {
                 if (currentZ < (state.previousZ - threshold)) {
                     state.movementPhase = 'down';
@@ -694,7 +824,7 @@
         
         function registerRep() {
             state.currentExercise.reps++;
-            updateCurrentExerciseUI();
+            document.getElementById('currentReps').textContent = state.currentExercise.reps;
             
             if (navigator.vibrate) {
                 navigator.vibrate(100);
@@ -702,8 +832,62 @@
         }
         
         // ============================================
-        // SESSION MANAGEMENT
+        // LIBRARY
         // ============================================
+        function addToLibrary() {
+            showModal('modalAddLibrary');
+        }
+        
+        function confirmAddLibrary() {
+            const name = document.getElementById('inputLibraryName').value.trim();
+            
+            if (!name) {
+                showToast('Entrez un nom', 'error');
+                return;
+            }
+            
+            state.exercises.push({
+                id: Date.now(),
+                name: name
+            });
+            
+            saveData();
+            renderLibrary();
+            hideModal('modalAddLibrary');
+            document.getElementById('inputLibraryName').value = '';
+            showToast('Exercice ajouté !', 'success');
+        }
+        
+        function deleteFromLibrary(id) {
+            if (confirm('Supprimer cet exercice ?')) {
+                state.exercises = state.exercises.filter(ex => ex.id !== id);
+                saveData();
+                renderLibrary();
+                showToast('Exercice supprimé', 'success');
+            }
+        }
+        
+        function renderLibrary() {
+            const container = document.getElementById('exerciseLibrary');
+            
+            if (state.exercises.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 40px;">Aucun exercice. Ajoutez-en un !</p>';
+                return;
+            }
+            
+            container.innerHTML = state.exercises.map(ex => `
+                <div class="library-item">
+                    <div class="library-item-name">${ex.name}</div>
+                    <button class="btn btn-danger btn-small" onclick="deleteFromLibrary(${ex.id})">🗑️</button>
+                </div>
+            `).join('');
+        }
+        
+        // ============================================
+        // SESSION
+        // ============================================
+        let sessionTimerInterval = null;
+        
         function startSession() {
             state.currentSession = {
                 startTime: Date.now(),
@@ -711,32 +895,64 @@
                 totalReps: 0
             };
             
-            startSessionTimer();
+            sessionTimerInterval = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - state.currentSession.startTime) / 1000);
+                const minutes = Math.floor(elapsed / 60);
+                const seconds = elapsed % 60;
+                document.getElementById('sessionTimer').textContent = 
+                    `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            }, 1000);
+            
             showScreen('screenSession');
             showToast('Séance démarrée !', 'success');
         }
         
         function addExercise() {
-            showModal('modalAddExercise');
-        }
-        
-        function confirmAddExercise() {
-            const name = document.getElementById('inputExerciseName').value.trim();
-            
-            if (!name) {
-                showToast('Entrez un nom', 'error');
+            if (state.exercises.length === 0) {
+                showToast('Créez d\'abord des exercices dans Profil', 'error');
                 return;
             }
             
-            // Terminer l'exercice précédent s'il existe
+            renderExerciseSelection();
+            showModal('modalSelectExercise');
+        }
+        
+        function renderExerciseSelection() {
+            const container = document.getElementById('exerciseSelectionList');
+            container.innerHTML = state.exercises.map(ex => `
+                <div class="selection-item" onclick="selectExercise(${ex.id})">
+                    ${ex.name}
+                </div>
+            `).join('');
+        }
+        
+        function selectExercise(id) {
+            state.selectedExercise = state.exercises.find(ex => ex.id === id);
+            hideModal('modalSelectExercise');
+            
+            document.getElementById('modalWeightTitle').textContent = state.selectedExercise.name;
+            showModal('modalSetWeight');
+        }
+        
+        function confirmWeight() {
+            const weight = parseFloat(document.getElementById('inputWeight').value);
+            
+            if (!weight || weight <= 0) {
+                showToast('Entrez un poids valide', 'error');
+                return;
+            }
+            
+            // Finish previous exercise if exists
             if (state.currentExercise) {
                 finishExercise();
             }
             
-            // Créer nouvel exercice
+            // Create new exercise
             state.currentExercise = {
-                name: name,
+                name: state.selectedExercise.name,
+                weight: weight,
                 reps: 0,
+                velocities: [],
                 startTime: Date.now(),
                 endTime: null
             };
@@ -748,69 +964,78 @@
             state.movementPhase = 'neutral';
             state.velocities = [];
             
-            document.getElementById('inputExerciseName').value = '';
-            hideModal('modalAddExercise');
-            updateCurrentExerciseUI();
-            showToast(`${name} démarré !`, 'success');
-        }
-        
-        function updateCurrentExerciseUI() {
-            if (state.currentExercise) {
-                document.getElementById('currentExerciseContainer').style.display = 'block';
-                document.getElementById('currentRepCount').textContent = state.currentExercise.reps;
-            } else {
-                document.getElementById('currentExerciseContainer').style.display = 'none';
-            }
+            // Update UI
+            document.getElementById('currentExerciseName').textContent = state.currentExercise.name;
+            document.getElementById('currentExerciseWeight').textContent = `${weight} kg`;
+            document.getElementById('currentReps').textContent = '0';
+            document.getElementById('currentVelocity').innerHTML = '0<span class="stat-unit">m/s</span>';
+            document.getElementById('avgVelocity').innerHTML = '0<span class="stat-unit">m/s</span>';
+            document.getElementById('currentExerciseContainer').classList.remove('hidden');
+            
+            hideModal('modalSetWeight');
+            document.getElementById('inputWeight').value = '';
+            showToast(`${state.currentExercise.name} démarré !`, 'success');
         }
         
         function finishExercise() {
             if (!state.currentExercise) return;
             
             state.currentExercise.endTime = Date.now();
+            const duration = Math.floor((state.currentExercise.endTime - state.currentExercise.startTime) / 1000);
+            state.currentExercise.duration = duration;
+            
+            const avgVel = state.currentExercise.velocities.length > 0 
+                ? state.currentExercise.velocities.reduce((a, b) => a + b, 0) / state.currentExercise.velocities.length 
+                : 0;
+            state.currentExercise.avgVelocity = avgVel;
+            
             state.currentSession.exercises.push(state.currentExercise);
             state.currentSession.totalReps += state.currentExercise.reps;
             
             renderExerciseList();
             state.currentExercise = null;
-            updateCurrentExerciseUI();
+            document.getElementById('currentExerciseContainer').classList.add('hidden');
             showToast('Exercice terminé !', 'success');
         }
         
         function renderExerciseList() {
             const container = document.getElementById('exerciseList');
             
-            if (state.currentSession.exercises.length === 0) {
+            if (!state.currentSession || state.currentSession.exercises.length === 0) {
                 container.innerHTML = '';
                 return;
             }
             
-            container.innerHTML = state.currentSession.exercises.map((ex, i) => {
-                const duration = Math.floor((ex.endTime - ex.startTime) / 1000);
-                return `
-                    <div class="exercise-card">
+            container.innerHTML = state.currentSession.exercises.map(ex => `
+                <div class="exercise-card">
+                    <div class="exercise-header">
                         <div class="exercise-name">${ex.name}</div>
-                        <div class="exercise-stats">
-                            <div class="stat">
-                                <div class="stat-label">Reps</div>
-                                <div class="stat-value">${ex.reps}</div>
-                            </div>
-                            <div class="stat">
-                                <div class="stat-label">Durée</div>
-                                <div class="stat-value">${duration}s</div>
-                            </div>
+                        <div style="color: var(--text-secondary);">${ex.weight} kg</div>
+                    </div>
+                    <div class="exercise-stats">
+                        <div class="exercise-stat">
+                            <div class="exercise-stat-label">Reps</div>
+                            <div class="exercise-stat-value">${ex.reps}</div>
+                        </div>
+                        <div class="exercise-stat">
+                            <div class="exercise-stat-label">Vitesse</div>
+                            <div class="exercise-stat-value">${ex.avgVelocity.toFixed(2)}</div>
+                        </div>
+                        <div class="exercise-stat">
+                            <div class="exercise-stat-label">Durée</div>
+                            <div class="exercise-stat-value">${ex.duration}s</div>
                         </div>
                     </div>
-                `;
-            }).join('');
+                </div>
+            `).join('');
         }
         
         function endSession() {
-            // Finir l'exercice en cours si existe
             if (state.currentExercise) {
                 finishExercise();
             }
             
-            if (state.currentSession.exercises.length === 0) {
+            if (!state.currentSession || state.currentSession.exercises.length === 0) {
                 showToast('Ajoutez au moins un exercice', 'error');
                 return;
             }
@@ -818,20 +1043,6 @@
             state.currentSession.endTime = Date.now();
             state.currentSession.duration = Math.floor((state.currentSession.endTime - state.currentSession.startTime) / 1000);
             
-            saveSession();
-            stopSessionTimer();
-            
-            // Proposer le partage
-            if (confirm('Séance terminée ! Voulez-vous la partager ?')) {
-                openShareModal(state.currentSession);
-            }
-            
-            state.currentSession = null;
-            showScreen('screenDashboard');
-            showToast('Séance sauvegardée !', 'success');
-        }
-        
-        function saveSession() {
             state.sessions.push({
                 date: state.currentSession.startTime,
                 exercises: state.currentSession.exercises,
@@ -839,183 +1050,56 @@
                 duration: state.currentSession.duration
             });
             
-            saveSessions();
-        }
-        
-        // ============================================
-        // SESSION TIMER
-        // ============================================
-        let sessionTimerInterval = null;
-        
-        function startSessionTimer() {
-            sessionTimerInterval = setInterval(() => {
-                if (!state.currentSession) return;
-                
-                const elapsed = Math.floor((Date.now() - state.currentSession.startTime) / 1000);
-                const minutes = Math.floor(elapsed / 60);
-                const seconds = elapsed % 60;
-                
-                document.getElementById('sessionTimer').textContent = 
-                    `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-            }, 1000);
-        }
-        
-        function stopSessionTimer() {
+            saveData();
+            
             if (sessionTimerInterval) {
                 clearInterval(sessionTimerInterval);
                 sessionTimerInterval = null;
             }
+            
+            state.currentSession = null;
+            showScreen('screenDashboard');
+            showToast('Séance sauvegardée !', 'success');
         }
         
         // ============================================
         // HISTORY
         // ============================================
-        function viewHistory() {
-            renderHistory();
-            showScreen('screenHistory');
-        }
-        
         function renderHistory() {
             const container = document.getElementById('historyList');
             
             if (state.sessions.length === 0) {
-                container.innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 40px;">Aucune séance enregistrée</p>';
+                container.innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 40px;">Aucune séance</p>';
                 return;
             }
             
-            container.innerHTML = state.sessions.slice().reverse().map((session, i) => {
+            container.innerHTML = state.sessions.slice().reverse().map(session => {
                 const date = new Date(session.date);
                 const minutes = Math.floor(session.duration / 60);
                 
                 return `
-                    <div class="session-item" onclick="openShareModal(${state.sessions.length - 1 - i})">
-                        <div class="session-date">
+                    <div class="exercise-card">
+                        <div style="color: var(--text-secondary); margin-bottom: 8px;">
                             ${date.toLocaleDateString('fr-FR')} à ${date.toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'})}
                         </div>
-                        <div>${session.exercises.length} exercice(s)</div>
-                        <div class="session-summary">
-                            <div class="summary-stat">
-                                <div class="summary-value">${session.totalReps}</div>
-                                <div class="summary-label">Reps</div>
+                        <div style="margin-bottom: 12px;">${session.exercises.length} exercice(s)</div>
+                        <div class="exercise-stats">
+                            <div class="exercise-stat">
+                                <div class="exercise-stat-label">Reps</div>
+                                <div class="exercise-stat-value">${session.totalReps}</div>
                             </div>
-                            <div class="summary-stat">
-                                <div class="summary-value">${minutes}</div>
-                                <div class="summary-label">Min</div>
+                            <div class="exercise-stat">
+                                <div class="exercise-stat-label">Durée</div>
+                                <div class="exercise-stat-value">${minutes}min</div>
+                            </div>
+                            <div class="exercise-stat">
+                                <div class="exercise-stat-label">Exercices</div>
+                                <div class="exercise-stat-value">${session.exercises.length}</div>
                             </div>
                         </div>
                     </div>
                 `;
             }).join('');
-        }
-        
-        // ============================================
-        // SHARE STORY
-        // ============================================
-        function openShareModal(sessionIndex) {
-            const session = typeof sessionIndex === 'number' ? state.sessions[sessionIndex] : sessionIndex;
-            
-            if (!session) return;
-            
-            state.shareSession = session;
-            showModal('modalShare');
-        }
-        
-        document.getElementById('inputShareImage').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                generateShareImage(event.target.result);
-            };
-            reader.readAsDataURL(file);
-        });
-        
-        function generateShareImage(backgroundImage) {
-            const canvas = document.getElementById('shareCanvas');
-            const ctx = canvas.getContext('2d');
-            
-            const img = new Image();
-            img.onload = function() {
-                // Draw background
-                ctx.drawImage(img, 0, 0, 1080, 1920);
-                
-                // Dark overlay
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-                ctx.fillRect(0, 0, 1080, 1920);
-                
-                // Session data
-                const session = state.shareSession;
-                const date = new Date(session.date);
-                const minutes = Math.floor(session.duration / 60);
-                
-                // Title
-                ctx.fillStyle = '#22c55e';
-                ctx.font = 'bold 80px sans-serif';
-                ctx.textAlign = 'center';
-                ctx.fillText('💪 MA SÉANCE', 540, 300);
-                
-                // Date
-                ctx.fillStyle = '#ffffff';
-                ctx.font = '40px sans-serif';
-                ctx.fillText(date.toLocaleDateString('fr-FR'), 540, 400);
-                
-                // Stats
-                ctx.font = 'bold 120px sans-serif';
-                ctx.fillStyle = '#22c55e';
-                ctx.fillText(session.totalReps, 540, 650);
-                ctx.font = '50px sans-serif';
-                ctx.fillStyle = '#94a3b8';
-                ctx.fillText('RÉPÉTITIONS', 540, 730);
-                
-                ctx.font = 'bold 120px sans-serif';
-                ctx.fillStyle = '#22c55e';
-                ctx.fillText(minutes, 540, 950);
-                ctx.font = '50px sans-serif';
-                ctx.fillStyle = '#94a3b8';
-                ctx.fillText('MINUTES', 540, 1030);
-                
-                // Exercises
-                ctx.font = 'bold 60px sans-serif';
-                ctx.fillStyle = '#ffffff';
-                ctx.fillText('EXERCICES', 540, 1200);
-                
-                ctx.font = '45px sans-serif';
-                ctx.textAlign = 'left';
-                let y = 1300;
-                session.exercises.forEach(ex => {
-                    ctx.fillStyle = '#94a3b8';
-                    ctx.fillText(`• ${ex.name}`, 200, y);
-                    ctx.fillStyle = '#22c55e';
-                    ctx.textAlign = 'right';
-                    ctx.fillText(`${ex.reps} reps`, 880, y);
-                    ctx.textAlign = 'left';
-                    y += 80;
-                });
-                
-                // Watermark
-                ctx.font = '35px sans-serif';
-                ctx.fillStyle = '#ffffff';
-                ctx.textAlign = 'center';
-                ctx.fillText('Rep Tracker', 540, 1820);
-                
-                // Show preview
-                const preview = document.getElementById('sharePreview');
-                preview.src = canvas.toDataURL('image/jpeg', 0.9);
-                document.getElementById('sharePreviewContainer').style.display = 'block';
-                document.getElementById('btnDownloadShare').style.display = 'block';
-            };
-            img.src = backgroundImage;
-        }
-        
-        function downloadShareImage() {
-            const canvas = document.getElementById('shareCanvas');
-            const link = document.createElement('a');
-            link.download = `rep-tracker-${Date.now()}.jpg`;
-            link.href = canvas.toDataURL('image/jpeg', 0.9);
-            link.click();
-            
-            showToast('Image téléchargée !', 'success');
         }
         
         // ============================================
@@ -1034,20 +1118,35 @@
         document.getElementById('btnConnect').addEventListener('click', connectBLE);
         document.getElementById('btnDisconnect').addEventListener('click', disconnectBLE);
         document.getElementById('btnStartSession').addEventListener('click', startSession);
-        document.getElementById('btnViewHistory').addEventListener('click', viewHistory);
+        document.getElementById('btnViewHistory').addEventListener('click', () => showScreen('screenHistory'));
+        document.getElementById('btnBackFromHistory').addEventListener('click', () => showScreen('screenDashboard'));
         document.getElementById('btnAddExercise').addEventListener('click', addExercise);
-        document.getElementById('btnConfirmAddExercise').addEventListener('click', confirmAddExercise);
-        document.getElementById('btnCancelAddExercise').addEventListener('click', () => hideModal('modalAddExercise'));
         document.getElementById('btnFinishExercise').addEventListener('click', finishExercise);
         document.getElementById('btnEndSession').addEventListener('click', endSession);
-        document.getElementById('btnBackToDashboard').addEventListener('click', () => showScreen('screenDashboard'));
-        document.getElementById('btnDownloadShare').addEventListener('click', downloadShareImage);
-        document.getElementById('btnCloseShare').addEventListener('click', () => hideModal('modalShare'));
+        
+        // Library
+        document.getElementById('btnAddToLibrary').addEventListener('click', addToLibrary);
+        document.getElementById('btnConfirmLibrary').addEventListener('click', confirmAddLibrary);
+        document.getElementById('btnCancelLibrary').addEventListener('click', () => hideModal('modalAddLibrary'));
+        
+        // Exercise selection
+        document.getElementById('btnCancelSelect').addEventListener('click', () => hideModal('modalSelectExercise'));
+        document.getElementById('btnConfirmWeight').addEventListener('click', confirmWeight);
+        document.getElementById('btnCancelWeight').addEventListener('click', () => hideModal('modalSetWeight'));
+        
+        // Bottom nav
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', () => {
+                if (state.isConnected) {
+                    showScreen(item.dataset.screen);
+                }
+            });
+        });
         
         // ============================================
         // INIT
         // ============================================
-        loadSessions();
+        loadData();
     </script>
 </body>
 </html>
