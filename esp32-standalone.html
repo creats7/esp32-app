@@ -1713,14 +1713,12 @@
                 cardGradient.addColorStop(0, 'rgba(255, 255, 255, 0.12)');
                 cardGradient.addColorStop(1, 'rgba(255, 255, 255, 0.08)');
                 ctx.fillStyle = cardGradient;
-                ctx.roundRect(80, cardY, 920, cardHeight, 24);
-                ctx.fill();
+                ctx.fillRect(80, cardY, 920, cardHeight);
                 
                 // Card border
                 ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
                 ctx.lineWidth = 2;
-                ctx.roundRect(80, cardY, 920, cardHeight, 24);
-                ctx.stroke();
+                ctx.strokeRect(80, cardY, 920, cardHeight);
                 
                 // Stats grid inside card
                 const statsY = cardY + 80;
