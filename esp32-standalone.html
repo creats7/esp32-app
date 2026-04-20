@@ -464,8 +464,100 @@
         }
         
         /* ============================================
+           STATS HEATMAP
+           ============================================ */
+        .stats-period-toggle {
+            display: flex;
+            gap: var(--space-sm);
+            margin-bottom: var(--space-lg);
+            background: var(--black-card);
+            border-radius: var(--radius-md);
+            padding: 4px;
+        }
+        
+        .period-btn {
+            flex: 1;
+            padding: var(--space-sm) var(--space-md);
+            border: none;
+            background: transparent;
+            color: var(--white-secondary);
+            font-size: 15px;
+            font-weight: 600;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all var(--transition-base);
+        }
+        
+        .period-btn.active {
+            background: var(--white-pure);
+            color: var(--black-deep);
+        }
+        
+        .heatmap-container {
+            background: var(--black-card);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+        }
+        
+        .heatmap-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-lg);
+        }
+        
+        .heatmap-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--white-primary);
+        }
+        
+        .heatmap-count {
+            font-size: 13px;
+            color: var(--white-secondary);
+        }
+        
+        .heatmap-grid {
+            display: grid;
+            gap: 6px;
+        }
+        
+        .heatmap-day {
+            aspect-ratio: 1;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.05);
+            transition: all var(--transition-base);
+            position: relative;
+        }
+        
+        .heatmap-day.active {
+            background: var(--white-pure);
+        }
+        
+        .heatmap-day.today {
+            border: 2px solid var(--white-pure);
+        }
+        
+        .heatmap-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: var(--space-sm);
+            font-size: 11px;
+            color: var(--white-secondary);
+            font-weight: 600;
+        }
+        
+        /* ============================================
            LIBRARY
            ============================================ */
+        .library-section-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: var(--space-lg);
+            color: var(--white-primary);
+        }
+        
         .category-section {
             margin-bottom: var(--space-xl);
         }
@@ -483,24 +575,93 @@
         .library-item {
             background: var(--black-card);
             border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: var(--radius-md);
-            padding: var(--space-md) var(--space-lg);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
             margin-bottom: var(--space-sm);
             display: flex;
             justify-content: space-between;
             align-items: center;
             transition: all var(--transition-base);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .library-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.03);
+            opacity: 0;
+            transition: opacity var(--transition-base);
+        }
+        
+        .library-item:active::before {
+            opacity: 1;
         }
         
         .library-item:hover {
-            background: var(--black-elevated);
             border-color: rgba(255, 255, 255, 0.12);
+            transform: translateY(-1px);
         }
         
         .library-item-name {
             font-size: 17px;
             font-weight: 600;
             color: var(--white-primary);
+            flex: 1;
+        }
+        
+        .btn-delete-exercise {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-full);
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all var(--transition-base);
+            font-size: 18px;
+        }
+        
+        .btn-delete-exercise:active {
+            transform: scale(0.9);
+            background: rgba(239, 68, 68, 0.2);
+        }
+        
+        /* FAB - Floating Action Button */
+        .fab {
+            position: fixed;
+            bottom: calc(80px + var(--space-lg));
+            right: var(--space-lg);
+            width: 56px;
+            height: 56px;
+            border-radius: var(--radius-full);
+            background: var(--white-pure);
+            color: var(--black-deep);
+            border: none;
+            font-size: 28px;
+            font-weight: 300;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            transition: all var(--transition-base);
+            z-index: 100;
+        }
+        
+        .fab:active {
+            transform: scale(0.92);
+        }
+        
+        .fab:hover {
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
         }
         
         /* ============================================
@@ -832,10 +993,6 @@
                 Démarrer une séance
             </button>
             
-            <button class="btn btn-secondary" id="btnViewHistory">
-                Historique
-            </button>
-            
             <button class="btn btn-secondary" id="btnConnectFromDashboard" style="display: none;">
                 Connecter RepSense
             </button>
@@ -900,7 +1057,7 @@
         </div>
         
         <!-- ============================================
-             SCREEN: HISTORY
+             SCREEN: STATS
              ============================================ -->
         <div id="screenHistory" class="screen">
             <div class="header">
@@ -914,15 +1071,54 @@
                             </g>
                         </svg>
                     </div>
-                    <h1 class="title">Historique</h1>
+                    <h1 class="title">Stats</h1>
                 </div>
             </div>
             
-            <div id="historyList"></div>
+            <!-- Period Toggle -->
+            <div class="stats-period-toggle">
+                <button class="period-btn active" id="btnWeekView">Semaine</button>
+                <button class="period-btn" id="btnMonthView">Mois</button>
+            </div>
             
-            <button class="btn btn-secondary" id="btnBackFromHistory">
-                ← Retour
-            </button>
+            <!-- Heatmap Module -->
+            <div class="heatmap-container">
+                <div class="heatmap-header">
+                    <div class="heatmap-title" id="heatmapTitle">Cette semaine</div>
+                    <div class="heatmap-count" id="heatmapCount">0 séances</div>
+                </div>
+                <div class="heatmap-grid" id="heatmapGrid"></div>
+                <div class="heatmap-labels" id="heatmapLabels"></div>
+            </div>
+            
+            <!-- Evolution Records -->
+            <div class="exercise-card" style="margin-top: var(--space-lg);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-md);">
+                    <div style="font-size: 17px; font-weight: 600; color: var(--white-primary);">Évolution record</div>
+                    <select id="recordExerciseSelect" style="background: var(--black-elevated); color: var(--white-pure); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-sm); padding: 8px 12px; font-size: 14px; font-weight: 500; cursor: pointer;">
+                        <option value="">Choisir exercice...</option>
+                    </select>
+                </div>
+                
+                <div id="recordGraphContainer" style="display: none;">
+                    <div style="display: flex; align-items: baseline; gap: 4px; margin-bottom: var(--space-lg);">
+                        <span id="recordMaxWeight" style="font-size: 48px; font-weight: 700; color: var(--white-pure);">0</span>
+                        <span style="font-size: 20px; font-weight: 600; color: var(--white-secondary);">kg</span>
+                    </div>
+                    
+                    <div style="position: relative; height: 200px;" id="recordGraph">
+                        <canvas id="recordCanvas"></canvas>
+                    </div>
+                    
+                    <div style="margin-top: var(--space-md); font-size: 13px; color: var(--white-secondary); text-align: center;">
+                        <span id="recordSessions">0</span> séances · Record: <span id="recordDate">-</span>
+                    </div>
+                </div>
+                
+                <div id="recordEmptyState" style="text-align: center; padding: 40px; color: var(--white-secondary);">
+                    Sélectionnez un exercice pour voir son évolution
+                </div>
+            </div>
         </div>
         
         <!-- ============================================
@@ -940,16 +1136,24 @@
                             </g>
                         </svg>
                     </div>
-                    <h1 class="title">Mes exercices</h1>
+                    <h1 class="title">Profil</h1>
                 </div>
-                <p class="subtitle">Bibliothèque personnelle</p>
             </div>
             
-            <div id="exerciseLibrary"></div>
+            <!-- Section Historique -->
+            <div style="margin-bottom: var(--space-xl);">
+                <h2 class="library-section-title">Historique</h2>
+                <div id="historyList"></div>
+            </div>
             
-            <button class="btn btn-primary" id="btnAddToLibrary">
-                Nouvel exercice
-            </button>
+            <!-- Section Bibliothèque d'exercices -->
+            <div style="margin-bottom: 80px;">
+                <h2 class="library-section-title">Mes exercices</h2>
+                <div id="exerciseLibrary"></div>
+            </div>
+            
+            <!-- FAB - Floating Action Button -->
+            <button class="fab" id="btnAddToLibrary">+</button>
         </div>
     </div>
     
@@ -1054,16 +1258,16 @@
                     <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line>
                 </svg>
             </div>
-            <div class="nav-label">Historique</div>
+            <div class="nav-label">Stats</div>
         </button>
         <button class="nav-item" data-screen="screenProfile">
             <div class="nav-icon">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="3"></circle>
-                    <path d="M12 1v6m0 6v6m-6-6h6m6 0h6"></path>
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
                 </svg>
             </div>
-            <div class="nav-label">Exercices</div>
+            <div class="nav-label">Profil</div>
         </button>
     </nav>
     
@@ -1144,13 +1348,23 @@
             const navItem = document.querySelector(`[data-screen="${screenId}"]`);
             if (navItem) navItem.classList.add('active');
             
-            if (screenId === 'screenProfile') renderLibrary();
-            if (screenId === 'screenHistory') renderHistory();
+            if (screenId === 'screenProfile') {
+                renderLibrary();
+                renderHistory();
+            }
+            if (screenId === 'screenHistory') renderStats();
             if (screenId === 'screenHome') updateConnectionUI();
         }
         
         function showModal(modalId) {
             document.getElementById(modalId).classList.add('active');
+            
+            // Auto-focus sur l'input du modal d'ajout d'exercice
+            if (modalId === 'modalAddLibrary') {
+                setTimeout(() => {
+                    document.getElementById('inputLibraryName').focus();
+                }, 100);
+            }
         }
         
         function hideModal(modalId) {
@@ -1369,7 +1583,7 @@
             const container = document.getElementById('exerciseLibrary');
             
             if (state.exercises.length === 0) {
-                container.innerHTML = '<p style="text-align: center; color: var(--white-secondary); padding: 40px;">Aucun exercice. Ajoutez-en un !</p>';
+                container.innerHTML = '<p style="text-align: center; color: var(--white-secondary); padding: 40px;">Appuyez sur + pour ajouter un exercice</p>';
                 return;
             }
             
@@ -1392,7 +1606,9 @@
                         ${categories[cat].map(ex => `
                             <div class="library-item">
                                 <div class="library-item-name">${ex.name}</div>
-                                <button class="btn btn-danger btn-small" onclick="deleteFromLibrary(${ex.id})">Supprimer</button>
+                                <button class="btn-delete-exercise" onclick="deleteFromLibrary(${ex.id})" title="Supprimer">
+                                    ×
+                                </button>
                             </div>
                         `).join('')}
                     </div>`;
@@ -1622,7 +1838,7 @@
             const container = document.getElementById('historyList');
             
             if (state.sessions.length === 0) {
-                container.innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 40px;">Aucune séance</p>';
+                container.innerHTML = '<p style="text-align: center; color: var(--white-secondary); padding: 40px;">Aucune séance</p>';
                 return;
             }
             
@@ -1635,7 +1851,7 @@
                 
                 return `
                     <div class="exercise-card">
-                        <div style="color: var(--text-secondary); margin-bottom: 8px;">
+                        <div style="color: var(--white-secondary); margin-bottom: 8px;">
                             ${date.toLocaleDateString('fr-FR')} à ${date.toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'})}
                         </div>
                         <div style="margin-bottom: 12px;">${session.exercises.length} exercice(s)</div>
@@ -1659,6 +1875,282 @@
                     </div>
                 `;
             }).join('');
+        }
+        
+        let statsViewMode = 'week'; // 'week' ou 'month'
+        
+        function renderStats() {
+            renderHeatmap();
+            renderRecordDropdown();
+        }
+        
+        function renderRecordDropdown() {
+            const select = document.getElementById('recordExerciseSelect');
+            
+            // Get all unique exercises that have been done
+            const exerciseMap = new Map();
+            
+            state.sessions.forEach(session => {
+                session.exercises.forEach(ex => {
+                    if (!exerciseMap.has(ex.name)) {
+                        exerciseMap.set(ex.name, []);
+                    }
+                    exerciseMap.get(ex.name).push({
+                        date: session.date,
+                        weight: ex.weight,
+                        reps: ex.reps
+                    });
+                });
+            });
+            
+            // Sort by name
+            const exercises = Array.from(exerciseMap.keys()).sort();
+            
+            // Populate dropdown
+            select.innerHTML = '<option value="">Choisir exercice...</option>' + 
+                exercises.map(name => `<option value="${name}">${name}</option>`).join('');
+            
+            // Reset graph
+            document.getElementById('recordGraphContainer').style.display = 'none';
+            document.getElementById('recordEmptyState').style.display = 'block';
+        }
+        
+        function renderRecordGraph(exerciseName) {
+            if (!exerciseName) {
+                document.getElementById('recordGraphContainer').style.display = 'none';
+                document.getElementById('recordEmptyState').style.display = 'block';
+                return;
+            }
+            
+            // Get all data for this exercise
+            const data = [];
+            state.sessions.forEach(session => {
+                session.exercises.forEach(ex => {
+                    if (ex.name === exerciseName) {
+                        data.push({
+                            date: new Date(session.date),
+                            weight: ex.weight,
+                            reps: ex.reps
+                        });
+                    }
+                });
+            });
+            
+            if (data.length === 0) return;
+            
+            // Sort by date
+            data.sort((a, b) => a.date - b.date);
+            
+            // Calculate max weight
+            const maxWeight = Math.max(...data.map(d => d.weight));
+            const maxEntry = data.find(d => d.weight === maxWeight);
+            
+            // Show container
+            document.getElementById('recordGraphContainer').style.display = 'block';
+            document.getElementById('recordEmptyState').style.display = 'none';
+            
+            // Update stats
+            document.getElementById('recordMaxWeight').textContent = maxWeight;
+            document.getElementById('recordSessions').textContent = data.length;
+            document.getElementById('recordDate').textContent = maxEntry.date.toLocaleDateString('fr-FR');
+            
+            // Draw graph
+            drawRecordGraph(data, maxWeight);
+        }
+        
+        function drawRecordGraph(data, maxWeight) {
+            const canvas = document.getElementById('recordCanvas');
+            const container = document.getElementById('recordGraph');
+            const ctx = canvas.getContext('2d');
+            
+            // Set canvas size
+            canvas.width = container.clientWidth;
+            canvas.height = 200;
+            
+            const width = canvas.width;
+            const height = canvas.height;
+            const padding = 20;
+            const graphWidth = width - padding * 2;
+            const graphHeight = height - padding * 2;
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, width, height);
+            
+            if (data.length === 0) return;
+            
+            // Calculate scales
+            const minWeight = Math.min(...data.map(d => d.weight));
+            const weightRange = maxWeight - minWeight || 1;
+            
+            // Draw grid lines (horizontal)
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+            ctx.lineWidth = 1;
+            for (let i = 0; i <= 4; i++) {
+                const y = padding + (graphHeight / 4) * i;
+                ctx.beginPath();
+                ctx.moveTo(padding, y);
+                ctx.lineTo(width - padding, y);
+                ctx.stroke();
+            }
+            
+            // Draw line
+            ctx.strokeStyle = '#FFFFFF';
+            ctx.lineWidth = 3;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            
+            ctx.beginPath();
+            data.forEach((point, i) => {
+                const x = padding + (graphWidth / (data.length - 1 || 1)) * i;
+                const y = padding + graphHeight - ((point.weight - minWeight) / weightRange) * graphHeight;
+                
+                if (i === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            });
+            ctx.stroke();
+            
+            // Draw points
+            data.forEach((point, i) => {
+                const x = padding + (graphWidth / (data.length - 1 || 1)) * i;
+                const y = padding + graphHeight - ((point.weight - minWeight) / weightRange) * graphHeight;
+                
+                // Point background
+                ctx.fillStyle = '#0B0B0B';
+                ctx.beginPath();
+                ctx.arc(x, y, 6, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Point
+                ctx.fillStyle = '#FFFFFF';
+                ctx.beginPath();
+                ctx.arc(x, y, 4, 0, Math.PI * 2);
+                ctx.fill();
+            });
+        }
+        
+        function renderHeatmap() {
+            const now = new Date();
+            const grid = document.getElementById('heatmapGrid');
+            const title = document.getElementById('heatmapTitle');
+            const count = document.getElementById('heatmapCount');
+            const labels = document.getElementById('heatmapLabels');
+            
+            if (statsViewMode === 'week') {
+                renderWeekHeatmap(now, grid, title, count, labels);
+            } else {
+                renderMonthHeatmap(now, grid, title, count, labels);
+            }
+        }
+        
+        function renderWeekHeatmap(now, grid, title, count, labels) {
+            // Get current week (Lundi à Dimanche)
+            const dayOfWeek = now.getDay(); // 0 = Dimanche, 1 = Lundi
+            const monday = new Date(now);
+            monday.setDate(now.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
+            monday.setHours(0, 0, 0, 0);
+            
+            // Get workout days
+            const workoutDays = new Set();
+            state.sessions.forEach(session => {
+                const sessionDate = new Date(session.date);
+                sessionDate.setHours(0, 0, 0, 0);
+                const diffTime = sessionDate - monday;
+                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                if (diffDays >= 0 && diffDays < 7) {
+                    workoutDays.add(diffDays);
+                }
+            });
+            
+            // Set grid for 7 columns
+            grid.style.gridTemplateColumns = 'repeat(7, 1fr)';
+            
+            // Render days
+            const dayNames = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+            let html = '';
+            
+            for (let i = 0; i < 7; i++) {
+                const isActive = workoutDays.has(i);
+                const currentDay = new Date(monday);
+                currentDay.setDate(monday.getDate() + i);
+                const isToday = currentDay.toDateString() === now.toDateString();
+                
+                html += `<div class="heatmap-day ${isActive ? 'active' : ''} ${isToday ? 'today' : ''}"></div>`;
+            }
+            
+            grid.innerHTML = html;
+            
+            // Labels
+            labels.innerHTML = dayNames.map(d => `<span>${d}</span>`).join('');
+            
+            // Title & count
+            title.textContent = 'Cette semaine';
+            count.textContent = `${workoutDays.size} séance${workoutDays.size > 1 ? 's' : ''}`;
+        }
+        
+        function renderMonthHeatmap(now, grid, title, count, labels) {
+            const year = now.getFullYear();
+            const month = now.getMonth();
+            const firstDay = new Date(year, month, 1);
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            
+            // Get workout days
+            const workoutDays = new Set();
+            state.sessions.forEach(session => {
+                const sessionDate = new Date(session.date);
+                if (sessionDate.getMonth() === month && sessionDate.getFullYear() === year) {
+                    workoutDays.add(sessionDate.getDate());
+                }
+            });
+            
+            // Calculate grid columns (max 7 per row)
+            const startWeekday = firstDay.getDay(); // 0 = Dimanche
+            const startDay = startWeekday === 0 ? 6 : startWeekday - 1; // Adjust to Monday start
+            const totalCells = startDay + daysInMonth;
+            const rows = Math.ceil(totalCells / 7);
+            
+            // Set grid for 7 columns
+            grid.style.gridTemplateColumns = 'repeat(7, 1fr)';
+            
+            // Render days
+            let html = '';
+            
+            // Empty cells before first day
+            for (let i = 0; i < startDay; i++) {
+                html += '<div></div>';
+            }
+            
+            // Days of month
+            for (let day = 1; day <= daysInMonth; day++) {
+                const isActive = workoutDays.has(day);
+                const currentDate = new Date(year, month, day);
+                const isToday = currentDate.toDateString() === now.toDateString();
+                
+                html += `<div class="heatmap-day ${isActive ? 'active' : ''} ${isToday ? 'today' : ''}"></div>`;
+            }
+            
+            grid.innerHTML = html;
+            
+            // Labels (first and last day of month)
+            const monthName = now.toLocaleDateString('fr-FR', { month: 'long' });
+            labels.innerHTML = `<span>1</span><span>${daysInMonth}</span>`;
+            
+            // Title & count
+            title.textContent = monthName.charAt(0).toUpperCase() + monthName.slice(1);
+            count.textContent = `${workoutDays.size} séance${workoutDays.size > 1 ? 's' : ''}`;
+        }
+        
+        function switchStatsView(mode) {
+            statsViewMode = mode;
+            
+            // Update buttons
+            document.getElementById('btnWeekView').classList.toggle('active', mode === 'week');
+            document.getElementById('btnMonthView').classList.toggle('active', mode === 'month');
+            
+            // Render
+            renderHeatmap();
         }
         
         // ============================================
@@ -1827,8 +2319,6 @@
         document.getElementById('btnConnectFromDashboard').addEventListener('click', connectBLE);
         document.getElementById('btnDisconnect').addEventListener('click', disconnectBLE);
         document.getElementById('btnStartSession').addEventListener('click', startSession);
-        document.getElementById('btnViewHistory').addEventListener('click', () => showScreen('screenHistory'));
-        document.getElementById('btnBackFromHistory').addEventListener('click', () => showScreen('screenDashboard'));
         document.getElementById('btnAddExercise').addEventListener('click', addExercise);
         document.getElementById('btnFinishExercise').addEventListener('click', finishExercise);
         document.getElementById('btnEndSession').addEventListener('click', endSession);
@@ -1837,10 +2327,26 @@
         document.getElementById('btnIncrement').addEventListener('click', incrementRep);
         document.getElementById('btnDecrement').addEventListener('click', decrementRep);
         
+        // Stats view toggle
+        document.getElementById('btnWeekView').addEventListener('click', () => switchStatsView('week'));
+        document.getElementById('btnMonthView').addEventListener('click', () => switchStatsView('month'));
+        
+        // Record exercise selection
+        document.getElementById('recordExerciseSelect').addEventListener('change', function() {
+            renderRecordGraph(this.value);
+        });
+        
         // Library
         document.getElementById('btnAddToLibrary').addEventListener('click', addToLibrary);
         document.getElementById('btnConfirmLibrary').addEventListener('click', confirmAddLibrary);
         document.getElementById('btnCancelLibrary').addEventListener('click', () => hideModal('modalAddLibrary'));
+        
+        // Enter key validation for library input
+        document.getElementById('inputLibraryName').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                confirmAddLibrary();
+            }
+        });
         
         // Exercise selection
         document.getElementById('btnCancelSelect').addEventListener('click', () => hideModal('modalSelectExercise'));
