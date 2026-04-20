@@ -464,6 +464,131 @@
         }
         
         /* ============================================
+           HISTORY CARDS (Premium Apple-like)
+           ============================================ */
+        .history-card {
+            background: var(--black-card);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            margin-bottom: var(--space-md);
+            cursor: pointer;
+            transition: all var(--transition-base);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .history-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.02);
+            opacity: 0;
+            transition: opacity var(--transition-base);
+            pointer-events: none;
+        }
+        
+        .history-card:hover {
+            border-color: rgba(255, 255, 255, 0.12);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        }
+        
+        .history-card:hover::before {
+            opacity: 1;
+        }
+        
+        .history-card:active {
+            transform: translateY(-1px);
+        }
+        
+        .history-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: var(--space-sm);
+        }
+        
+        .history-card-date {
+            font-size: 17px;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            color: var(--white-pure);
+        }
+        
+        .history-card-duration {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--white-secondary);
+            font-variant-numeric: tabular-nums;
+        }
+        
+        .history-card-stats {
+            display: flex;
+            gap: var(--space-lg);
+            margin-top: var(--space-md);
+            padding-top: var(--space-md);
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        
+        .history-stat-item {
+            flex: 1;
+        }
+        
+        .history-stat-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--white-secondary);
+            margin-bottom: 4px;
+        }
+        
+        .history-stat-value {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--white-pure);
+            font-variant-numeric: tabular-nums;
+        }
+        
+        .history-empty {
+            text-align: center;
+            padding: var(--space-xxl) var(--space-lg);
+            color: var(--white-secondary);
+            font-size: 15px;
+        }
+        
+        /* Detail Modal */
+        .history-detail-exercise {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: var(--radius-md);
+            padding: var(--space-md);
+            margin-bottom: var(--space-sm);
+        }
+        
+        .history-detail-exercise-name {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--white-pure);
+            margin-bottom: var(--space-xs);
+        }
+        
+        .history-detail-sets {
+            margin-top: var(--space-sm);
+        }
+        
+        .history-detail-set {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+            font-size: 14px;
+            color: var(--white-secondary);
+        }
+        
+        /* ============================================
            STATS HEATMAP
            ============================================ */
         .stats-period-toggle {
@@ -1179,7 +1304,7 @@
             
             <!-- Section Historique -->
             <div style="margin-bottom: var(--space-xl);">
-                <h2 class="library-section-title">Historique</h2>
+                <h2 class="library-section-title">Historique des séances</h2>
                 <div id="historyList"></div>
             </div>
             
@@ -1285,6 +1410,15 @@
             </div>
             <button class="btn btn-primary" id="btnConfirmSet">Ajouter</button>
             <button class="btn btn-secondary" id="btnCancelSet">Annuler</button>
+        </div>
+    </div>
+    
+    <!-- Session Detail -->
+    <div id="modalSessionDetail" class="modal">
+        <div class="modal-content" style="max-height: 70vh; overflow-y: auto;">
+            <h3 class="modal-title" id="sessionDetailTitle">Détail de la séance</h3>
+            <div id="sessionDetailContent"></div>
+            <button class="btn btn-secondary" id="btnCloseSessionDetail">Fermer</button>
         </div>
     </div>
     
@@ -2056,43 +2190,95 @@
             const container = document.getElementById('historyList');
             
             if (state.sessions.length === 0) {
-                container.innerHTML = '<p style="text-align: center; color: var(--white-secondary); padding: 40px;">Aucune séance</p>';
+                container.innerHTML = '<div class="history-empty">Pas encore de séance<br><span style="font-size: 13px; opacity: 0.7;">Démarrez votre première séance pour commencer votre historique</span></div>';
                 return;
             }
             
-            container.innerHTML = state.sessions.slice().reverse().map((session, idx) => {
+            // Tri par date décroissante (plus récente en premier)
+            const sortedSessions = state.sessions.slice().reverse();
+            
+            container.innerHTML = sortedSessions.map((session, idx) => {
                 const date = new Date(session.date);
-                const hours = Math.floor(session.duration / 3600);
-                const minutes = Math.floor((session.duration % 3600) / 60);
-                const durationText = hours > 0 ? `${hours}H ${minutes}M` : `${minutes}M`;
                 const originalIndex = state.sessions.length - 1 - idx;
                 
+                // Format date élégant : "Lundi 12 Avril"
+                const options = { weekday: 'long', day: 'numeric', month: 'long' };
+                const dateFormatted = date.toLocaleDateString('fr-FR', options);
+                const dateCapitalized = dateFormatted.charAt(0).toUpperCase() + dateFormatted.slice(1);
+                
+                // Format durée
+                const hours = Math.floor(session.duration / 3600);
+                const minutes = Math.floor((session.duration % 3600) / 60);
+                const durationText = hours > 0 ? `${hours}h ${minutes}min` : `${minutes}min`;
+                
+                // Volume total (avec rétrocompatibilité)
+                const volume = session.totalVolume || 0;
+                
                 return `
-                    <div class="exercise-card">
-                        <div style="color: var(--white-secondary); margin-bottom: 8px;">
-                            ${date.toLocaleDateString('fr-FR')} à ${date.toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'})}
+                    <div class="history-card" data-session-index="${originalIndex}">
+                        <div class="history-card-header">
+                            <div class="history-card-date">${dateCapitalized}</div>
+                            <div class="history-card-duration">${durationText}</div>
                         </div>
-                        <div style="margin-bottom: 12px;">${session.exercises.length} exercice(s)</div>
-                        <div class="exercise-stats">
-                            <div class="exercise-stat">
-                                <div class="exercise-stat-label">Reps</div>
-                                <div class="exercise-stat-value">${session.totalReps}</div>
+                        <div class="history-card-stats">
+                            <div class="history-stat-item">
+                                <div class="history-stat-label">Reps</div>
+                                <div class="history-stat-value">${session.totalReps}</div>
                             </div>
-                            <div class="exercise-stat">
-                                <div class="exercise-stat-label">Durée</div>
-                                <div class="exercise-stat-value">${durationText}</div>
+                            <div class="history-stat-item">
+                                <div class="history-stat-label">Exercices</div>
+                                <div class="history-stat-value">${session.exercises.length}</div>
                             </div>
-                            <div class="exercise-stat">
-                                <div class="exercise-stat-label">Exercices</div>
-                                <div class="exercise-stat-value">${session.exercises.length}</div>
+                            <div class="history-stat-item">
+                                <div class="history-stat-label">Volume</div>
+                                <div class="history-stat-value">${volume}<span style="font-size: 13px; font-weight: 600; margin-left: 2px;">kg</span></div>
                             </div>
                         </div>
-                        <button class="btn btn-primary btn-small" onclick="openShareModal(${originalIndex})" style="margin-top: 12px;">
-                            Partager
-                        </button>
                     </div>
                 `;
             }).join('');
+        }
+        
+        function openSessionDetail(sessionIndex) {
+            const session = state.sessions[sessionIndex];
+            if (!session) return;
+            
+            const date = new Date(session.date);
+            const options = { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' };
+            const dateFormatted = date.toLocaleDateString('fr-FR', options);
+            const dateCapitalized = dateFormatted.charAt(0).toUpperCase() + dateFormatted.slice(1);
+            
+            document.getElementById('sessionDetailTitle').textContent = dateCapitalized;
+            
+            const content = session.exercises.map(ex => {
+                // Calcul reps total
+                const totalReps = ex.sets ? ex.sets.reduce((sum, set) => sum + set.reps, 0) : ex.reps;
+                const volume = ex.totalVolume || 0;
+                
+                return `
+                    <div class="history-detail-exercise">
+                        <div class="history-detail-exercise-name">${ex.name}</div>
+                        <div style="display: flex; gap: var(--space-lg); margin-top: var(--space-xs); font-size: 14px; color: var(--white-secondary);">
+                            <div>Reps: ${totalReps}</div>
+                            <div>Volume: ${volume} kg</div>
+                            ${ex.duration ? `<div>Durée: ${ex.duration}s</div>` : ''}
+                        </div>
+                        ${ex.sets && ex.sets.length > 0 ? `
+                            <div class="history-detail-sets">
+                                ${ex.sets.map((set, i) => `
+                                    <div class="history-detail-set">
+                                        <span>Série ${i + 1}</span>
+                                        <span>${set.weight}kg × ${set.reps} = ${set.volume}kg</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+            
+            document.getElementById('sessionDetailContent').innerHTML = content;
+            showModal('modalSessionDetail');
         }
         
         let statsViewMode = 'week'; // 'week' ou 'month'
@@ -2568,6 +2754,9 @@
         document.getElementById('btnConfirmSet').addEventListener('click', confirmAddSet);
         document.getElementById('btnCancelSet').addEventListener('click', () => hideModal('modalAddSet'));
         
+        // Session Detail
+        document.getElementById('btnCloseSessionDetail').addEventListener('click', () => hideModal('modalSessionDetail'));
+        
         // Enter key validation for library input
         document.getElementById('inputLibraryName').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
@@ -2624,6 +2813,17 @@
         // GLOBAL EVENT DELEGATION
         // ============================================
         document.addEventListener('click', function(e) {
+            // History card click
+            const historyCard = e.target.closest('.history-card');
+            if (historyCard) {
+                const sessionIndex = parseInt(historyCard.dataset.sessionIndex);
+                if (sessionIndex >= 0) {
+                    console.log('Open session detail:', sessionIndex);
+                    openSessionDetail(sessionIndex);
+                }
+                return;
+            }
+            
             // Edit exercise button
             const editBtn = e.target.closest('.btn-edit-exercise');
             if (editBtn) {
