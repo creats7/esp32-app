@@ -1097,6 +1097,167 @@
         }
         
         /* ============================================
+           FOCUS MODE
+           ============================================ */
+        .focus-mode {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--black-deep);
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            padding: var(--space-lg);
+            animation: slideUp 0.3s ease;
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .focus-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-xl);
+        }
+        
+        .btn-back-focus, .btn-finish-focus {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--black-card);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--white-pure);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-back-focus:active, .btn-finish-focus:active {
+            transform: scale(0.95);
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .focus-exercise-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--white-pure);
+        }
+        
+        .focus-set-number {
+            text-align: center;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            color: var(--white-secondary);
+            margin-bottom: var(--space-lg);
+        }
+        
+        .focus-reps-display {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: var(--space-xxl) 0;
+        }
+        
+        .focus-reps-value {
+            font-size: 120px;
+            font-weight: 900;
+            color: var(--white-pure);
+            line-height: 1;
+            margin-bottom: var(--space-md);
+            transition: transform 0.2s;
+        }
+        
+        .focus-reps-value.pulse {
+            animation: pulse 0.3s;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .focus-reps-label {
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            color: var(--white-secondary);
+        }
+        
+        .focus-weight-input {
+            margin-bottom: var(--space-xl);
+        }
+        
+        .focus-weight-input input {
+            width: 100%;
+            font-size: 24px;
+            text-align: center;
+            padding: var(--space-lg);
+            background: var(--black-card);
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: var(--radius-lg);
+            color: var(--white-pure);
+            font-weight: 700;
+        }
+        
+        .focus-weight-input input:focus {
+            border-color: var(--white-pure);
+            outline: none;
+        }
+        
+        .quick-weight-adjust {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            margin-bottom: var(--space-lg);
+        }
+        
+        .btn-weight-adjust {
+            flex: 0 0 60px;
+            height: 48px;
+            border-radius: var(--radius-md);
+            background: var(--black-card);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--white-pure);
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-weight-adjust:active {
+            transform: scale(0.95);
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .quick-weight-adjust input {
+            flex: 1;
+        }
+        
+        .focus-actions {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+        }
+        
+        /* ============================================
            UTILITIES
            ============================================ */
         .hidden {
@@ -1230,11 +1391,50 @@
                         <button class="btn-counter" id="btnIncrement">+</button>
                     </div>
                     
+                    <button class="btn btn-primary" id="btnFocusToggle" style="margin-bottom: var(--space-sm);">
+                        🎯 Mode Focus
+                    </button>
+                    
                     <button class="btn btn-primary" id="btnAddSet" style="margin-bottom: var(--space-sm);">
                         Ajouter une série
                     </button>
                     
                     <button class="btn btn-secondary" id="btnFinishExercise">
+                        Terminer l'exercice
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Focus Mode -->
+            <div id="focusMode" class="focus-mode hidden">
+                <div class="focus-header">
+                    <button class="btn-back-focus" id="btnBackFocus">←</button>
+                    <div class="focus-exercise-name" id="focusExerciseName">—</div>
+                    <button class="btn-finish-focus" id="btnFinishFocus">✓</button>
+                </div>
+                
+                <div class="focus-set-number">SÉRIE <span id="focusSetNumber">1</span></div>
+                
+                <div class="focus-reps-display">
+                    <div class="focus-reps-value" id="focusReps">0</div>
+                    <div class="focus-reps-label">RÉPÉTITIONS</div>
+                </div>
+                
+                <div class="quick-weight-adjust">
+                    <button class="btn-weight-adjust" data-delta="-2.5">-2.5</button>
+                    <button class="btn-weight-adjust" data-delta="-1">-1</button>
+                    <div class="focus-weight-input">
+                        <input type="number" id="focusWeightInput" placeholder="Poids (kg)" step="0.5">
+                    </div>
+                    <button class="btn-weight-adjust" data-delta="+1">+1</button>
+                    <button class="btn-weight-adjust" data-delta="+2.5">+2.5</button>
+                </div>
+                
+                <div class="focus-actions">
+                    <button class="btn btn-primary" id="btnFocusNextSet">
+                        Série suivante
+                    </button>
+                    <button class="btn btn-secondary" id="btnFocusFinish">
                         Terminer l'exercice
                     </button>
                 </div>
@@ -1548,6 +1748,9 @@
             currentExercise: null,
             sessions: [],
             
+            // UI
+            isFocusMode: false,
+            
             // Detection
             previousZ: 1.0,
             peakZ: 1.0,
@@ -1776,6 +1979,11 @@
             state.currentExercise.reps++;
             document.getElementById('currentReps').textContent = state.currentExercise.reps;
             
+            // Update focus mode if active
+            if (state.isFocusMode) {
+                updateFocusReps(state.currentExercise.reps);
+            }
+            
             if (navigator.vibrate) {
                 navigator.vibrate(100);
             }
@@ -1786,6 +1994,12 @@
             if (!state.currentExercise) return;
             state.currentExercise.reps++;
             document.getElementById('currentReps').textContent = state.currentExercise.reps;
+            
+            // Update focus mode if active
+            if (state.isFocusMode) {
+                updateFocusReps(state.currentExercise.reps);
+            }
+            
             if (navigator.vibrate) navigator.vibrate(50);
         }
         
@@ -1793,7 +2007,80 @@
             if (!state.currentExercise || state.currentExercise.reps <= 0) return;
             state.currentExercise.reps--;
             document.getElementById('currentReps').textContent = state.currentExercise.reps;
+            
+            // Update focus mode if active
+            if (state.isFocusMode) {
+                updateFocusReps(state.currentExercise.reps);
+            }
+            
             if (navigator.vibrate) navigator.vibrate(30);
+        }
+        
+        // ============================================
+        // FOCUS MODE
+        // ============================================
+        function toggleFocusMode() {
+            if (!state.currentExercise) return;
+            
+            state.isFocusMode = !state.isFocusMode;
+            
+            if (state.isFocusMode) {
+                // Enter focus mode
+                document.getElementById('focusMode').classList.remove('hidden');
+                
+                // Sync data
+                document.getElementById('focusExerciseName').textContent = state.currentExercise.name;
+                document.getElementById('focusSetNumber').textContent = (state.currentExercise.sets.length + 1);
+                document.getElementById('focusReps').textContent = state.currentExercise.reps;
+                document.getElementById('focusWeightInput').value = state.currentExercise.weight;
+            } else {
+                // Exit focus mode
+                document.getElementById('focusMode').classList.add('hidden');
+            }
+        }
+        
+        function updateFocusReps(reps) {
+            const focusRepsEl = document.getElementById('focusReps');
+            focusRepsEl.textContent = reps;
+            focusRepsEl.classList.add('pulse');
+            setTimeout(() => focusRepsEl.classList.remove('pulse'), 300);
+        }
+        
+        function focusNextSet() {
+            const weight = parseFloat(document.getElementById('focusWeightInput').value);
+            if (!weight || weight <= 0) {
+                showToast('Entrez un poids valide', 'error');
+                return;
+            }
+            
+            // Add set
+            state.currentExercise.sets.push({
+                weight: weight,
+                reps: state.currentExercise.reps
+            });
+            
+            updateSessionVolume();
+            renderExerciseList();
+            
+            // Reset reps
+            state.currentExercise.reps = 0;
+            document.getElementById('currentReps').textContent = '0';
+            document.getElementById('focusReps').textContent = '0';
+            
+            // Update set number
+            document.getElementById('focusSetNumber').textContent = (state.currentExercise.sets.length + 1);
+            
+            showToast(`Série ${state.currentExercise.sets.length} ajoutée`, 'success');
+            
+            // Vibration feedback
+            if (navigator.vibrate) {
+                navigator.vibrate([200, 100, 200]);
+            }
+        }
+        
+        function focusFinishExercise() {
+            toggleFocusMode();
+            finishExercise();
         }
         
         // ============================================
@@ -2091,18 +2378,13 @@
                 return;
             }
             
-            const volume = weight * reps;
-            
+            // Ajouter la série (sans calculer volume ici)
             state.currentExercise.sets.push({
                 weight: weight,
-                reps: reps,
-                volume: volume
+                reps: reps
             });
             
-            // Update exercise total volume
-            state.currentExercise.totalVolume = state.currentExercise.sets.reduce((sum, set) => sum + set.volume, 0);
-            
-            // Update session total volume
+            // Le volume sera recalculé dynamiquement
             updateSessionVolume();
             
             // Reset current reps for next set
@@ -2120,22 +2402,8 @@
         function updateSessionVolume() {
             if (!state.currentSession) return;
             
-            let totalVolume = 0;
-            
-            // Sum volumes from finished exercises
-            state.currentSession.exercises.forEach(ex => {
-                if (ex.sets && ex.sets.length > 0) {
-                    totalVolume += ex.sets.reduce((sum, set) => sum + set.volume, 0);
-                } else if (ex.totalVolume) {
-                    totalVolume += ex.totalVolume;
-                }
-            });
-            
-            // Add current exercise volume
-            if (state.currentExercise && state.currentExercise.totalVolume) {
-                totalVolume += state.currentExercise.totalVolume;
-            }
-            
+            // Recalcul complet à partir des données brutes
+            const totalVolume = calculateSessionVolume(state.currentSession, state.currentExercise);
             state.currentSession.totalVolume = totalVolume;
             
             // Update UI if element exists
@@ -2143,6 +2411,54 @@
             if (volumeEl) {
                 volumeEl.textContent = `${totalVolume.toFixed(0)} kg`;
             }
+        }
+        
+        // ============================================
+        // VOLUME CALCULATION (Pure Functions)
+        // ============================================
+        
+        /**
+         * Calcule le volume d'une série
+         * @param {Object} set - { weight: number, reps: number }
+         * @returns {number} volume en kg
+         */
+        function calculateSetVolume(set) {
+            if (!set || !set.weight || !set.reps) return 0;
+            return set.weight * set.reps;
+        }
+        
+        /**
+         * Calcule le volume total d'un exercice
+         * @param {Object} exercise - { sets: Array<{weight, reps}> }
+         * @returns {number} volume total en kg
+         */
+        function calculateExerciseVolume(exercise) {
+            if (!exercise || !exercise.sets || exercise.sets.length === 0) return 0;
+            return exercise.sets.reduce((total, set) => total + calculateSetVolume(set), 0);
+        }
+        
+        /**
+         * Calcule le volume total d'une séance
+         * @param {Object} session - { exercises: Array }
+         * @param {Object} currentExercise - Exercice en cours (optionnel)
+         * @returns {number} volume total en kg
+         */
+        function calculateSessionVolume(session, currentExercise = null) {
+            if (!session || !session.exercises) return 0;
+            
+            let totalVolume = 0;
+            
+            // Volume des exercices terminés
+            session.exercises.forEach(ex => {
+                totalVolume += calculateExerciseVolume(ex);
+            });
+            
+            // Ajouter exercice en cours si existe
+            if (currentExercise && currentExercise.sets) {
+                totalVolume += calculateExerciseVolume(currentExercise);
+            }
+            
+            return totalVolume;
         }
         
         function renderExerciseList() {
@@ -2153,7 +2469,12 @@
                 return;
             }
             
-            container.innerHTML = state.currentSession.exercises.map(ex => `
+            container.innerHTML = state.currentSession.exercises.map(ex => {
+                // Recalcul dynamique du volume
+                const volume = calculateExerciseVolume(ex);
+                const totalReps = ex.sets ? ex.sets.reduce((sum, set) => sum + set.reps, 0) : ex.reps;
+                
+                return `
                 <div class="exercise-card">
                     <div class="exercise-header">
                         <div class="exercise-name">${ex.name}</div>
@@ -2161,22 +2482,25 @@
                     </div>
                     ${ex.sets && ex.sets.length > 0 ? `
                         <div style="margin: var(--space-sm) 0;">
-                            ${ex.sets.map((set, i) => `
-                                <div style="display: flex; justify-content: space-between; padding: 4px 0; font-size: 14px; color: var(--white-secondary);">
-                                    <span>Série ${i + 1}</span>
-                                    <span>${set.weight}kg × ${set.reps} = ${set.volume}kg</span>
-                                </div>
-                            `).join('')}
+                            ${ex.sets.map((set, i) => {
+                                const setVolume = calculateSetVolume(set);
+                                return `
+                                    <div style="display: flex; justify-content: space-between; padding: 4px 0; font-size: 14px; color: var(--white-secondary);">
+                                        <span>Série ${i + 1}</span>
+                                        <span>${set.weight}kg × ${set.reps} = ${setVolume}kg</span>
+                                    </div>
+                                `;
+                            }).join('')}
                         </div>
                     ` : ''}
                     <div class="exercise-stats">
                         <div class="exercise-stat">
                             <div class="exercise-stat-label">Volume</div>
-                            <div class="exercise-stat-value">${ex.totalVolume || 0} kg</div>
+                            <div class="exercise-stat-value">${volume} kg</div>
                         </div>
                         <div class="exercise-stat">
                             <div class="exercise-stat-label">Reps Total</div>
-                            <div class="exercise-stat-value">${ex.sets ? ex.sets.reduce((sum, set) => sum + set.reps, 0) : ex.reps}</div>
+                            <div class="exercise-stat-value">${totalReps}</div>
                         </div>
                         <div class="exercise-stat">
                             <div class="exercise-stat-label">Durée</div>
@@ -2184,7 +2508,8 @@
                         </div>
                     </div>
                 </div>
-            `).join('');
+            `;
+            }).join('');
         }
         
         function endSession() {
@@ -2200,11 +2525,14 @@
             state.currentSession.endTime = Date.now();
             state.currentSession.duration = Math.floor((state.currentSession.endTime - state.currentSession.startTime) / 1000);
             
+            // CRITICAL: Recalculer le volume avant sauvegarde
+            const finalVolume = calculateSessionVolume(state.currentSession);
+            
             state.sessions.push({
                 date: state.currentSession.startTime,
                 exercises: state.currentSession.exercises,
                 totalReps: state.currentSession.totalReps,
-                totalVolume: state.currentSession.totalVolume || 0,
+                totalVolume: finalVolume,
                 duration: state.currentSession.duration
             });
             
@@ -2248,8 +2576,8 @@
                 const minutes = Math.floor((session.duration % 3600) / 60);
                 const durationText = hours > 0 ? `${hours}h ${minutes}min` : `${minutes}min`;
                 
-                // Volume total (avec rétrocompatibilité)
-                const volume = session.totalVolume || 0;
+                // CRITICAL: Recalcul dynamique du volume à partir des données brutes
+                const volume = calculateSessionVolume(session);
                 
                 return `
                     <div class="history-card" data-session-index="${originalIndex}">
@@ -2292,9 +2620,9 @@
             document.getElementById('sessionDetailTitle').textContent = dateCapitalized;
             
             const content = session.exercises.map(ex => {
-                // Calcul reps total
+                // Recalcul dynamique
                 const totalReps = ex.sets ? ex.sets.reduce((sum, set) => sum + set.reps, 0) : ex.reps;
-                const volume = ex.totalVolume || 0;
+                const volume = calculateExerciseVolume(ex);
                 
                 return `
                     <div class="history-detail-exercise">
@@ -2306,12 +2634,15 @@
                         </div>
                         ${ex.sets && ex.sets.length > 0 ? `
                             <div class="history-detail-sets">
-                                ${ex.sets.map((set, i) => `
-                                    <div class="history-detail-set">
-                                        <span>Série ${i + 1}</span>
-                                        <span>${set.weight}kg × ${set.reps} = ${set.volume}kg</span>
-                                    </div>
-                                `).join('')}
+                                ${ex.sets.map((set, i) => {
+                                    const setVolume = calculateSetVolume(set);
+                                    return `
+                                        <div class="history-detail-set">
+                                            <span>Série ${i + 1}</span>
+                                            <span>${set.weight}kg × ${set.reps} = ${setVolume}kg</span>
+                                        </div>
+                                    `;
+                                }).join('')}
                             </div>
                         ` : ''}
                     </div>
@@ -2781,6 +3112,22 @@
         // Manual controls
         document.getElementById('btnIncrement').addEventListener('click', incrementRep);
         document.getElementById('btnDecrement').addEventListener('click', decrementRep);
+        
+        // Focus Mode
+        document.getElementById('btnFocusToggle').addEventListener('click', toggleFocusMode);
+        document.getElementById('btnBackFocus').addEventListener('click', toggleFocusMode);
+        document.getElementById('btnFinishFocus').addEventListener('click', focusFinishExercise);
+        document.getElementById('btnFocusNextSet').addEventListener('click', focusNextSet);
+        
+        // Weight adjust buttons
+        document.querySelectorAll('.btn-weight-adjust').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const delta = parseFloat(btn.dataset.delta);
+                const input = document.getElementById('focusWeightInput');
+                const current = parseFloat(input.value) || 0;
+                input.value = Math.max(0, current + delta);
+            });
+        });
         
         // Stats view toggle
         document.getElementById('btnWeekView').addEventListener('click', () => switchStatsView('week'));
