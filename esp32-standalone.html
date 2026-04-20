@@ -596,6 +596,7 @@
             background: rgba(255, 255, 255, 0.03);
             opacity: 0;
             transition: opacity var(--transition-base);
+            pointer-events: none; /* Ne pas capturer les clics */
         }
         
         .library-item:active::before {
@@ -612,6 +613,7 @@
             font-weight: 600;
             color: var(--white-primary);
             flex: 1;
+            pointer-events: none; /* Le nom ne doit pas capturer les clics */
         }
         
         .btn-delete-exercise {
@@ -627,11 +629,36 @@
             cursor: pointer;
             transition: all var(--transition-base);
             font-size: 18px;
+            position: relative;
+            z-index: 100;
+            pointer-events: auto;
+            flex-shrink: 0;
+        }
+        
+        .btn-delete-exercise:hover {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: rgba(239, 68, 68, 0.4);
         }
         
         .btn-delete-exercise:active {
             transform: scale(0.9);
-            background: rgba(239, 68, 68, 0.2);
+            background: rgba(239, 68, 68, 0.3);
+        }
+        
+        .btn-edit-exercise {
+            position: relative;
+            z-index: 100;
+            pointer-events: auto;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        
+        .btn-edit-exercise:hover {
+            background: rgba(255, 255, 255, 0.15) !important;
+        }
+        
+        .btn-edit-exercise:active {
+            transform: scale(0.9);
         }
         
         /* FAB - Floating Action Button */
@@ -1698,7 +1725,7 @@
                         ${categories[cat].map(ex => `
                             <div class="library-item">
                                 <div class="library-item-name">${ex.name}</div>
-                                <div style="display: flex; gap: 8px;">
+                                <div style="display: flex; gap: 8px; position: relative; z-index: 100; pointer-events: auto;">
                                     <button class="btn-edit-exercise" data-id="${ex.id}" title="Modifier" style="width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: var(--white-pure); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; font-size: 18px;">
                                         ✎
                                     </button>
@@ -2598,23 +2625,29 @@
         // ============================================
         document.addEventListener('click', function(e) {
             // Edit exercise button
-            if (e.target.matches('.btn-edit-exercise') || e.target.closest('.btn-edit-exercise')) {
-                const btn = e.target.closest('.btn-edit-exercise') || e.target;
-                const id = parseInt(btn.dataset.id);
+            const editBtn = e.target.closest('.btn-edit-exercise');
+            if (editBtn) {
+                e.preventDefault();
+                e.stopPropagation();
+                const id = parseInt(editBtn.dataset.id);
                 if (id) {
                     console.log('Edit exercise:', id);
                     editExercise(id);
                 }
+                return;
             }
             
             // Delete exercise button
-            if (e.target.matches('.btn-delete-exercise') || e.target.closest('.btn-delete-exercise')) {
-                const btn = e.target.closest('.btn-delete-exercise') || e.target;
-                const id = parseInt(btn.dataset.id);
+            const deleteBtn = e.target.closest('.btn-delete-exercise');
+            if (deleteBtn) {
+                e.preventDefault();
+                e.stopPropagation();
+                const id = parseInt(deleteBtn.dataset.id);
                 if (id) {
                     console.log('Delete exercise:', id);
                     deleteFromLibrary(id);
                 }
+                return;
             }
         });
         
