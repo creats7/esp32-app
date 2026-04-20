@@ -505,6 +505,40 @@
             transform: translateY(-1px);
         }
         
+        .btn-delete-session {
+            position: absolute;
+            top: var(--space-sm);
+            right: var(--space-sm);
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 20px;
+            font-weight: 700;
+            line-height: 1;
+            z-index: 10;
+            pointer-events: auto;
+            transition: all var(--transition-base);
+            opacity: 0.7;
+        }
+        
+        .btn-delete-session:hover {
+            opacity: 1;
+            background: rgba(239, 68, 68, 0.2);
+            border-color: rgba(239, 68, 68, 0.4);
+            transform: scale(1.1);
+        }
+        
+        .btn-delete-session:active {
+            transform: scale(0.95);
+        }
+        
         .history-card-header {
             display: flex;
             justify-content: space-between;
@@ -1418,7 +1452,10 @@
         <div class="modal-content" style="max-height: 70vh; overflow-y: auto;">
             <h3 class="modal-title" id="sessionDetailTitle">Détail de la séance</h3>
             <div id="sessionDetailContent"></div>
-            <button class="btn btn-secondary" id="btnCloseSessionDetail">Fermer</button>
+            <div style="display: flex; gap: var(--space-sm); margin-top: var(--space-md);">
+                <button class="btn btn-primary" id="btnShareFromDetail" style="flex: 1;">Partager</button>
+                <button class="btn btn-secondary" id="btnCloseSessionDetail" style="flex: 1;">Fermer</button>
+            </div>
         </div>
     </div>
     
@@ -2216,6 +2253,7 @@
                 
                 return `
                     <div class="history-card" data-session-index="${originalIndex}">
+                        <button class="btn-delete-session" data-session-index="${originalIndex}" title="Supprimer">×</button>
                         <div class="history-card-header">
                             <div class="history-card-date">${dateCapitalized}</div>
                             <div class="history-card-duration">${durationText}</div>
@@ -2242,6 +2280,9 @@
         function openSessionDetail(sessionIndex) {
             const session = state.sessions[sessionIndex];
             if (!session) return;
+            
+            // Store for share button
+            state.currentDetailSessionIndex = sessionIndex;
             
             const date = new Date(session.date);
             const options = { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' };
@@ -2279,6 +2320,16 @@
             
             document.getElementById('sessionDetailContent').innerHTML = content;
             showModal('modalSessionDetail');
+        }
+        
+        function deleteSession(sessionIndex) {
+            if (confirm('Supprimer cette séance ?\nCette action est irréversible.')) {
+                state.sessions.splice(sessionIndex, 1);
+                saveData();
+                renderHistory();
+                renderStats(); // Refresh stats aussi
+                showToast('Séance supprimée', 'success');
+            }
         }
         
         let statsViewMode = 'week'; // 'week' ou 'month'
@@ -2756,6 +2807,12 @@
         
         // Session Detail
         document.getElementById('btnCloseSessionDetail').addEventListener('click', () => hideModal('modalSessionDetail'));
+        document.getElementById('btnShareFromDetail').addEventListener('click', () => {
+            if (state.currentDetailSessionIndex !== undefined) {
+                hideModal('modalSessionDetail');
+                openShareModal(state.currentDetailSessionIndex);
+            }
+        });
         
         // Enter key validation for library input
         document.getElementById('inputLibraryName').addEventListener('keypress', function(e) {
@@ -2813,6 +2870,19 @@
         // GLOBAL EVENT DELEGATION
         // ============================================
         document.addEventListener('click', function(e) {
+            // Delete session button
+            const deleteSessionBtn = e.target.closest('.btn-delete-session');
+            if (deleteSessionBtn) {
+                e.preventDefault();
+                e.stopPropagation();
+                const sessionIndex = parseInt(deleteSessionBtn.dataset.sessionIndex);
+                if (sessionIndex >= 0) {
+                    console.log('Delete session:', sessionIndex);
+                    deleteSession(sessionIndex);
+                }
+                return;
+            }
+            
             // History card click
             const historyCard = e.target.closest('.history-card');
             if (historyCard) {
