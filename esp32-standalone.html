@@ -1699,10 +1699,10 @@
                             <div class="library-item">
                                 <div class="library-item-name">${ex.name}</div>
                                 <div style="display: flex; gap: 8px;">
-                                    <button class="btn-delete-exercise" onclick="editExercise(${ex.id})" title="Modifier" style="background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); color: var(--white-pure);">
+                                    <button class="btn-edit-exercise" data-id="${ex.id}" title="Modifier" style="width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: var(--white-pure); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; font-size: 18px;">
                                         ✎
                                     </button>
-                                    <button class="btn-delete-exercise" onclick="deleteFromLibrary(${ex.id})" title="Supprimer">
+                                    <button class="btn-delete-exercise" data-id="${ex.id}" title="Supprimer">
                                         ×
                                     </button>
                                 </div>
@@ -2591,6 +2591,31 @@
             document.getElementById('sharePreviewContainer').style.display = 'none';
             document.getElementById('btnDownloadShare').style.display = 'none';
             document.getElementById('inputShareImage').value = '';
+        });
+        
+        // ============================================
+        // GLOBAL EVENT DELEGATION
+        // ============================================
+        document.addEventListener('click', function(e) {
+            // Edit exercise button
+            if (e.target.matches('.btn-edit-exercise') || e.target.closest('.btn-edit-exercise')) {
+                const btn = e.target.closest('.btn-edit-exercise') || e.target;
+                const id = parseInt(btn.dataset.id);
+                if (id) {
+                    console.log('Edit exercise:', id);
+                    editExercise(id);
+                }
+            }
+            
+            // Delete exercise button
+            if (e.target.matches('.btn-delete-exercise') || e.target.closest('.btn-delete-exercise')) {
+                const btn = e.target.closest('.btn-delete-exercise') || e.target;
+                const id = parseInt(btn.dataset.id);
+                if (id) {
+                    console.log('Delete exercise:', id);
+                    deleteFromLibrary(id);
+                }
+            }
         });
         
         // ============================================
