@@ -1097,7 +1097,7 @@
         }
         
         /* ============================================
-           FOCUS MODE
+           FOCUS MODE (Live Training Screen)
            ============================================ */
         .focus-mode {
             position: fixed;
@@ -1105,11 +1105,12 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: var(--black-deep);
+            background: #000000;
             z-index: 2000;
             display: flex;
             flex-direction: column;
-            padding: var(--space-lg);
+            padding: var(--space-md);
+            overflow-y: auto;
             animation: slideUp 0.3s ease;
         }
         
@@ -1124,137 +1125,283 @@
             }
         }
         
-        .focus-header {
+        /* Timer Header */
+        .focus-timer-header {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 12px 20px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            margin-bottom: var(--space-xl);
+            justify-content: space-between;
+            margin-bottom: var(--space-md);
         }
         
-        .btn-back-focus, .btn-finish-focus {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            background: var(--black-card);
-            border: 1px solid rgba(255,255,255,0.1);
+        .focus-timer-display {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--white-pure);
+        }
+        
+        .focus-timer-icon {
+            width: 24px;
+            height: 24px;
+        }
+        
+        .focus-header-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .focus-header-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.2);
+            border: none;
             color: var(--white-pure);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
             cursor: pointer;
-            transition: all 0.2s;
         }
         
-        .btn-back-focus:active, .btn-finish-focus:active {
-            transform: scale(0.95);
+        /* Exercise Card */
+        .focus-exercise-card {
             background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: var(--space-lg);
+            margin-bottom: var(--space-md);
         }
         
-        .focus-exercise-name {
+        .focus-exercise-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: var(--space-md);
+        }
+        
+        .focus-exercise-info {
+            flex: 1;
+        }
+        
+        .focus-exercise-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.1);
+            margin-right: var(--space-md);
+        }
+        
+        .focus-exercise-title {
             font-size: 20px;
             font-weight: 700;
             color: var(--white-pure);
+            margin-bottom: 4px;
+        }
+        
+        .focus-exercise-subtitle {
+            font-size: 14px;
+            color: rgba(255,255,255,0.6);
+        }
+        
+        /* Sets Table Headers */
+        .focus-sets-headers {
+            display: grid;
+            grid-template-columns: 50px 1fr 40px 1fr 40px 1fr 50px;
+            gap: 8px;
+            padding: 8px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.5);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        /* Set Row */
+        .focus-set-row {
+            display: grid;
+            grid-template-columns: 50px 1fr 40px 1fr 40px 1fr 50px;
+            gap: 8px;
+            align-items: center;
+            padding: 10px 12px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 12px;
+            margin-bottom: 6px;
+            transition: all 0.2s;
+        }
+        
+        .focus-set-row.active {
+            background: #a3e635;
+            color: #000;
+        }
+        
+        .focus-set-row.completed {
+            background: rgba(255,255,255,0.05);
+            opacity: 0.6;
         }
         
         .focus-set-number {
-            text-align: center;
-            font-size: 14px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-weight: 700;
-            letter-spacing: 0.1em;
-            color: var(--white-secondary);
+            font-size: 14px;
+        }
+        
+        .focus-set-row.active .focus-set-number {
+            background: #000;
+            color: #a3e635;
+        }
+        
+        .focus-set-value {
+            font-size: 16px;
+            font-weight: 700;
+            text-align: center;
+        }
+        
+        .focus-set-x {
+            font-size: 14px;
+            font-weight: 600;
+            opacity: 0.5;
+            text-align: center;
+        }
+        
+        .focus-set-check {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        
+        .focus-set-row.completed .focus-set-check {
+            background: #a3e635;
+            color: #000;
+        }
+        
+        /* Stats Bar */
+        .focus-stats-bar {
+            display: flex;
+            gap: var(--space-md);
             margin-bottom: var(--space-lg);
         }
         
-        .focus-reps-display {
+        .focus-stat-item {
             flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            margin: var(--space-xxl) 0;
+            text-align: center;
         }
         
-        .focus-reps-value {
-            font-size: 120px;
+        .focus-stat-value {
+            font-size: 32px;
             font-weight: 900;
             color: var(--white-pure);
             line-height: 1;
-            margin-bottom: var(--space-md);
-            transition: transform 0.2s;
+            margin-bottom: 4px;
         }
         
-        .focus-reps-value.pulse {
-            animation: pulse 0.3s;
-        }
-        
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-        
-        .focus-reps-label {
-            font-size: 14px;
+        .focus-stat-unit {
+            font-size: 16px;
             font-weight: 700;
-            letter-spacing: 0.1em;
-            color: var(--white-secondary);
+            opacity: 0.6;
+            margin-left: 4px;
         }
         
-        .focus-weight-input {
-            margin-bottom: var(--space-xl);
-        }
-        
-        .focus-weight-input input {
-            width: 100%;
-            font-size: 24px;
-            text-align: center;
-            padding: var(--space-lg);
-            background: var(--black-card);
-            border: 2px solid rgba(255,255,255,0.1);
-            border-radius: var(--radius-lg);
-            color: var(--white-pure);
-            font-weight: 700;
-        }
-        
-        .focus-weight-input input:focus {
-            border-color: var(--white-pure);
-            outline: none;
-        }
-        
-        .quick-weight-adjust {
+        .focus-stat-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.5);
             display: flex;
             align-items: center;
-            gap: var(--space-xs);
-            margin-bottom: var(--space-lg);
+            justify-content: center;
+            gap: 4px;
         }
         
-        .btn-weight-adjust {
-            flex: 0 0 60px;
-            height: 48px;
-            border-radius: var(--radius-md);
-            background: var(--black-card);
-            border: 1px solid rgba(255,255,255,0.1);
-            color: var(--white-pure);
+        .focus-stat-arrow {
+            color: #ef4444;
+        }
+        
+        /* Velocity Graph */
+        .focus-velocity-graph {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: var(--space-lg);
+            height: 200px;
+            position: relative;
+        }
+        
+        .focus-graph-bars {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            height: 140px;
+            gap: 4px;
+        }
+        
+        .focus-graph-bar {
+            flex: 1;
+            background: rgba(255,255,255,0.2);
+            border-radius: 4px 4px 0 0;
+            position: relative;
+            transition: all 0.3s;
+        }
+        
+        .focus-graph-bar.highlight {
+            background: #a3e635;
+        }
+        
+        .focus-graph-label {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 11px;
             font-weight: 600;
-            font-size: 16px;
+            color: rgba(255,255,255,0.6);
+        }
+        
+        /* Bottom Actions */
+        .focus-bottom-actions {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: var(--space-md);
+            background: #000;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .focus-action-btn {
+            width: 100%;
+            padding: 18px;
+            border-radius: 16px;
+            border: none;
+            font-size: 17px;
+            font-weight: 700;
             cursor: pointer;
             transition: all 0.2s;
         }
         
-        .btn-weight-adjust:active {
-            transform: scale(0.95);
+        .focus-action-btn.primary {
+            background: #a3e635;
+            color: #000;
+        }
+        
+        .focus-action-btn.secondary {
             background: rgba(255,255,255,0.1);
-        }
-        
-        .quick-weight-adjust input {
-            flex: 1;
-        }
-        
-        .focus-actions {
-            display: flex;
-            flex-direction: column;
-            gap: var(--space-sm);
+            color: var(--white-pure);
+            margin-top: var(--space-sm);
         }
         
         /* ============================================
@@ -1407,36 +1554,118 @@
             
             <!-- Focus Mode -->
             <div id="focusMode" class="focus-mode hidden">
-                <div class="focus-header">
-                    <button class="btn-back-focus" id="btnBackFocus">←</button>
-                    <div class="focus-exercise-name" id="focusExerciseName">—</div>
-                    <button class="btn-finish-focus" id="btnFinishFocus">✓</button>
-                </div>
-                
-                <div class="focus-set-number">SÉRIE <span id="focusSetNumber">1</span></div>
-                
-                <div class="focus-reps-display">
-                    <div class="focus-reps-value" id="focusReps">0</div>
-                    <div class="focus-reps-label">RÉPÉTITIONS</div>
-                </div>
-                
-                <div class="quick-weight-adjust">
-                    <button class="btn-weight-adjust" data-delta="-2.5">-2.5</button>
-                    <button class="btn-weight-adjust" data-delta="-1">-1</button>
-                    <div class="focus-weight-input">
-                        <input type="number" id="focusWeightInput" placeholder="Poids (kg)" step="0.5">
+                <!-- Timer Header -->
+                <div class="focus-timer-header">
+                    <div class="focus-timer-display">
+                        <svg class="focus-timer-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <polyline points="12 6 12 12 16 14"/>
+                        </svg>
+                        <span id="focusExerciseTimer">00:00:00</span>
                     </div>
-                    <button class="btn-weight-adjust" data-delta="+1">+1</button>
-                    <button class="btn-weight-adjust" data-delta="+2.5">+2.5</button>
+                    <div class="focus-header-actions">
+                        <button class="focus-header-btn" id="btnExpandFocus">▲</button>
+                        <button class="focus-header-btn" id="btnMenuFocus">≡</button>
+                    </div>
                 </div>
                 
-                <div class="focus-actions">
-                    <button class="btn btn-primary" id="btnFocusNextSet">
-                        Série suivante
-                    </button>
-                    <button class="btn btn-secondary" id="btnFocusFinish">
-                        Terminer l'exercice
-                    </button>
+                <!-- Exercise Card -->
+                <div class="focus-exercise-card">
+                    <div class="focus-exercise-header">
+                        <div style="display: flex; align-items: center; flex: 1;">
+                            <div class="focus-exercise-image"></div>
+                            <div class="focus-exercise-info">
+                                <div class="focus-exercise-title" id="focusExerciseName">Barbell bench press</div>
+                                <div class="focus-exercise-subtitle">Number of sets: <span id="focusTotalSets">3</span></div>
+                            </div>
+                        </div>
+                        <button class="focus-header-btn">≡</button>
+                    </div>
+                    
+                    <!-- Sets Headers -->
+                    <div class="focus-sets-headers">
+                        <div></div>
+                        <div style="text-align: center;">kg</div>
+                        <div></div>
+                        <div style="text-align: center;">reps</div>
+                        <div></div>
+                        <div style="text-align: center;">GPE</div>
+                        <div></div>
+                    </div>
+                    
+                    <!-- Sets List -->
+                    <div id="focusSetsContainer">
+                        <!-- Série 1 (active) -->
+                        <div class="focus-set-row active" data-set-index="0">
+                            <div class="focus-set-number">1</div>
+                            <div class="focus-set-value" contenteditable="true" id="focusWeight0">50</div>
+                            <div class="focus-set-x">×</div>
+                            <div class="focus-set-value" id="focusReps0">8</div>
+                            <div class="focus-set-x">×</div>
+                            <div class="focus-set-value">0.5</div>
+                            <div class="focus-set-check">✓</div>
+                        </div>
+                        
+                        <!-- Série 2 -->
+                        <div class="focus-set-row" data-set-index="1">
+                            <div class="focus-set-number">2</div>
+                            <div class="focus-set-value" contenteditable="true">50</div>
+                            <div class="focus-set-x">×</div>
+                            <div class="focus-set-value">10</div>
+                            <div class="focus-set-x">×</div>
+                            <div class="focus-set-value">--</div>
+                            <div class="focus-set-check">○</div>
+                        </div>
+                        
+                        <!-- Série 3 -->
+                        <div class="focus-set-row" data-set-index="2">
+                            <div class="focus-set-number">3</div>
+                            <div class="focus-set-value" contenteditable="true">50</div>
+                            <div class="focus-set-x">×</div>
+                            <div class="focus-set-value">12</div>
+                            <div class="focus-set-x">×</div>
+                            <div class="focus-set-value">--</div>
+                            <div class="focus-set-check">○</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Stats Bar -->
+                <div class="focus-stats-bar">
+                    <div class="focus-stat-item">
+                        <div class="focus-stat-value">
+                            <span id="focusTotalVolume">750</span>
+                            <span class="focus-stat-unit">kg</span>
+                        </div>
+                        <div class="focus-stat-label">Total Volume</div>
+                    </div>
+                    <div class="focus-stat-item">
+                        <div class="focus-stat-value" id="focusCurrentReps">7</div>
+                        <div class="focus-stat-label">
+                            Reps 
+                            <span class="focus-stat-arrow">▼</span>
+                        </div>
+                    </div>
+                    <div class="focus-stat-item">
+                        <div class="focus-stat-value">
+                            <span id="focusMeanVelocity">0.52</span>
+                            <span class="focus-stat-unit">m/s</span>
+                        </div>
+                        <div class="focus-stat-label">Mean V</div>
+                    </div>
+                </div>
+                
+                <!-- Velocity Graph -->
+                <div class="focus-velocity-graph">
+                    <div class="focus-graph-bars" id="focusGraphBars">
+                        <!-- Bars will be generated dynamically -->
+                    </div>
+                </div>
+                
+                <!-- Bottom Actions -->
+                <div class="focus-bottom-actions">
+                    <button class="focus-action-btn primary" id="btnFocusComplete">Complete Set</button>
+                    <button class="focus-action-btn secondary" id="btnFocusBack">← Back</button>
                 </div>
             </div>
             
@@ -1981,7 +2210,8 @@
             
             // Update focus mode if active
             if (state.isFocusMode) {
-                updateFocusReps(state.currentExercise.reps);
+                updateFocusStats();
+                renderVelocityGraph();
             }
             
             if (navigator.vibrate) {
@@ -1997,7 +2227,7 @@
             
             // Update focus mode if active
             if (state.isFocusMode) {
-                updateFocusReps(state.currentExercise.reps);
+                updateFocusStats();
             }
             
             if (navigator.vibrate) navigator.vibrate(50);
@@ -2010,7 +2240,7 @@
             
             // Update focus mode if active
             if (state.isFocusMode) {
-                updateFocusReps(state.currentExercise.reps);
+                updateFocusStats();
             }
             
             if (navigator.vibrate) navigator.vibrate(30);
@@ -2028,59 +2258,148 @@
                 // Enter focus mode
                 document.getElementById('focusMode').classList.remove('hidden');
                 
+                // Start exercise timer
+                state.exerciseStartTime = Date.now();
+                state.exerciseTimerInterval = setInterval(updateExerciseTimer, 1000);
+                
                 // Sync data
                 document.getElementById('focusExerciseName').textContent = state.currentExercise.name;
-                document.getElementById('focusSetNumber').textContent = (state.currentExercise.sets.length + 1);
-                document.getElementById('focusReps').textContent = state.currentExercise.reps;
-                document.getElementById('focusWeightInput').value = state.currentExercise.weight;
+                document.getElementById('focusTotalSets').textContent = state.currentExercise.sets.length;
+                document.getElementById('focusCurrentReps').textContent = state.currentExercise.reps;
+                
+                // Render sets
+                renderFocusSets();
+                
+                // Render velocity graph
+                renderVelocityGraph();
+                
+                // Update stats
+                updateFocusStats();
             } else {
                 // Exit focus mode
                 document.getElementById('focusMode').classList.add('hidden');
+                
+                // Stop timer
+                if (state.exerciseTimerInterval) {
+                    clearInterval(state.exerciseTimerInterval);
+                    state.exerciseTimerInterval = null;
+                }
             }
         }
         
-        function updateFocusReps(reps) {
-            const focusRepsEl = document.getElementById('focusReps');
-            focusRepsEl.textContent = reps;
-            focusRepsEl.classList.add('pulse');
-            setTimeout(() => focusRepsEl.classList.remove('pulse'), 300);
+        function updateExerciseTimer() {
+            if (!state.exerciseStartTime) return;
+            const elapsed = Math.floor((Date.now() - state.exerciseStartTime) / 1000);
+            const hours = Math.floor(elapsed / 3600);
+            const minutes = Math.floor((elapsed % 3600) / 60);
+            const seconds = elapsed % 60;
+            document.getElementById('focusExerciseTimer').textContent = 
+                `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
         }
         
-        function focusNextSet() {
-            const weight = parseFloat(document.getElementById('focusWeightInput').value);
+        function renderFocusSets() {
+            const container = document.getElementById('focusSetsContainer');
+            const sets = state.currentExercise.sets || [];
+            const currentSetIndex = sets.length;
+            
+            container.innerHTML = sets.map((set, index) => {
+                const isCompleted = true;
+                return `
+                    <div class="focus-set-row completed" data-set-index="${index}">
+                        <div class="focus-set-number">${index + 1}</div>
+                        <div class="focus-set-value">${set.weight}</div>
+                        <div class="focus-set-x">×</div>
+                        <div class="focus-set-value">${set.reps}</div>
+                        <div class="focus-set-x">×</div>
+                        <div class="focus-set-value">${(set.velocity || 0).toFixed(2)}</div>
+                        <div class="focus-set-check">✓</div>
+                    </div>
+                `;
+            }).join('') + `
+                <div class="focus-set-row active" data-set-index="${currentSetIndex}">
+                    <div class="focus-set-number">${currentSetIndex + 1}</div>
+                    <div class="focus-set-value" contenteditable="true" id="focusCurrentWeight">${state.currentExercise.weight}</div>
+                    <div class="focus-set-x">×</div>
+                    <div class="focus-set-value" id="focusCurrentSetReps">${state.currentExercise.reps}</div>
+                    <div class="focus-set-x">×</div>
+                    <div class="focus-set-value">--</div>
+                    <div class="focus-set-check">○</div>
+                </div>
+            `;
+        }
+        
+        function renderVelocityGraph() {
+            const container = document.getElementById('focusGraphBars');
+            const velocities = state.currentExercise.velocities || [];
+            
+            if (velocities.length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: rgba(255,255,255,0.5); padding: 40px;">Aucune donnée de vélocité</div>';
+                return;
+            }
+            
+            const maxVelocity = Math.max(...velocities, 1);
+            
+            container.innerHTML = velocities.map((vel, index) => {
+                const height = (vel / maxVelocity) * 100;
+                const isHighlight = index === velocities.length - 1;
+                return `
+                    <div class="focus-graph-bar ${isHighlight ? 'highlight' : ''}" style="height: ${height}%">
+                        <div class="focus-graph-label">${vel.toFixed(2)}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function updateFocusStats() {
+            // Update total volume
+            const totalVolume = calculateSessionVolume(state.currentSession, state.currentExercise);
+            document.getElementById('focusTotalVolume').textContent = totalVolume.toFixed(0);
+            
+            // Update current reps
+            document.getElementById('focusCurrentReps').textContent = state.currentExercise.reps;
+            document.getElementById('focusCurrentSetReps').textContent = state.currentExercise.reps;
+            
+            // Update mean velocity
+            const velocities = state.currentExercise.velocities || [];
+            if (velocities.length > 0) {
+                const meanVel = velocities.reduce((a, b) => a + b, 0) / velocities.length;
+                document.getElementById('focusMeanVelocity').textContent = meanVel.toFixed(2);
+            }
+        }
+        
+        function focusCompleteSet() {
+            const weightEl = document.getElementById('focusCurrentWeight');
+            const weight = parseFloat(weightEl ? weightEl.textContent : state.currentExercise.weight);
+            
             if (!weight || weight <= 0) {
-                showToast('Entrez un poids valide', 'error');
+                showToast('Poids invalide', 'error');
                 return;
             }
             
             // Add set
             state.currentExercise.sets.push({
                 weight: weight,
-                reps: state.currentExercise.reps
+                reps: state.currentExercise.reps,
+                velocity: state.currentExercise.velocities.length > 0 ? 
+                    state.currentExercise.velocities[state.currentExercise.velocities.length - 1] : 0
             });
             
             updateSessionVolume();
-            renderExerciseList();
             
             // Reset reps
             state.currentExercise.reps = 0;
             document.getElementById('currentReps').textContent = '0';
-            document.getElementById('focusReps').textContent = '0';
             
-            // Update set number
-            document.getElementById('focusSetNumber').textContent = (state.currentExercise.sets.length + 1);
+            // Update UI
+            renderFocusSets();
+            updateFocusStats();
             
-            showToast(`Série ${state.currentExercise.sets.length} ajoutée`, 'success');
+            showToast(`Série ${state.currentExercise.sets.length} complétée`, 'success');
             
             // Vibration feedback
             if (navigator.vibrate) {
                 navigator.vibrate([200, 100, 200]);
             }
-        }
-        
-        function focusFinishExercise() {
-            toggleFocusMode();
-            finishExercise();
         }
         
         // ============================================
@@ -3115,19 +3434,8 @@
         
         // Focus Mode
         document.getElementById('btnFocusToggle').addEventListener('click', toggleFocusMode);
-        document.getElementById('btnBackFocus').addEventListener('click', toggleFocusMode);
-        document.getElementById('btnFinishFocus').addEventListener('click', focusFinishExercise);
-        document.getElementById('btnFocusNextSet').addEventListener('click', focusNextSet);
-        
-        // Weight adjust buttons
-        document.querySelectorAll('.btn-weight-adjust').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const delta = parseFloat(btn.dataset.delta);
-                const input = document.getElementById('focusWeightInput');
-                const current = parseFloat(input.value) || 0;
-                input.value = Math.max(0, current + delta);
-            });
-        });
+        document.getElementById('btnFocusBack').addEventListener('click', toggleFocusMode);
+        document.getElementById('btnFocusComplete').addEventListener('click', focusCompleteSet);
         
         // Stats view toggle
         document.getElementById('btnWeekView').addEventListener('click', () => switchStatsView('week'));
