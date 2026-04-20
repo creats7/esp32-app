@@ -1011,6 +1011,12 @@
                 <div class="session-timer" id="sessionTimer">00:00</div>
             </div>
             
+            <!-- Session Volume -->
+            <div style="background: var(--black-card); border: 1px solid rgba(255,255,255,0.06); border-radius: var(--radius-lg); padding: var(--space-lg); margin-bottom: var(--space-lg);">
+                <div style="font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--white-secondary); margin-bottom: var(--space-sm);">Volume Total</div>
+                <div style="font-size: 32px; font-weight: 700; color: var(--white-pure);" id="sessionVolume">0 kg</div>
+            </div>
+            
             <!-- Current Exercise -->
             <div id="currentExerciseContainer" class="hidden">
                 <div class="current-exercise-display">
@@ -1037,6 +1043,10 @@
                         <button class="btn-counter" id="btnDecrement">−</button>
                         <button class="btn-counter" id="btnIncrement">+</button>
                     </div>
+                    
+                    <button class="btn btn-primary" id="btnAddSet" style="margin-bottom: var(--space-sm);">
+                        Ajouter une série
+                    </button>
                     
                     <button class="btn btn-secondary" id="btnFinishExercise">
                         Terminer l'exercice
@@ -1208,6 +1218,49 @@
         </div>
     </div>
     
+    <!-- Edit Exercise -->
+    <div id="modalEditLibrary" class="modal">
+        <div class="modal-content">
+            <h3 class="modal-title">Modifier l'exercice</h3>
+            <div class="form-group">
+                <label class="form-label">Nom de l'exercice</label>
+                <input type="text" class="form-input" id="inputEditLibraryName" placeholder="Ex: Curl biceps">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Groupe musculaire</label>
+                <select class="form-input" id="inputEditLibraryCategory">
+                    <option value="Pectoraux">Pectoraux</option>
+                    <option value="Dos">Dos</option>
+                    <option value="Épaules">Épaules</option>
+                    <option value="Biceps">Biceps</option>
+                    <option value="Triceps">Triceps</option>
+                    <option value="Jambes">Jambes</option>
+                    <option value="Abdos">Abdos</option>
+                    <option value="Cardio">Cardio</option>
+                </select>
+            </div>
+            <button class="btn btn-primary" id="btnConfirmEditLibrary">Enregistrer</button>
+            <button class="btn btn-secondary" id="btnCancelEditLibrary">Annuler</button>
+        </div>
+    </div>
+    
+    <!-- Add Set -->
+    <div id="modalAddSet" class="modal">
+        <div class="modal-content">
+            <h3 class="modal-title">Ajouter une série</h3>
+            <div class="form-group">
+                <label class="form-label">Poids (kg)</label>
+                <input type="number" class="form-input" id="inputSetWeight" placeholder="Ex: 20" step="0.5">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Répétitions</label>
+                <input type="number" class="form-input" id="inputSetReps" placeholder="Ex: 10">
+            </div>
+            <button class="btn btn-primary" id="btnConfirmSet">Ajouter</button>
+            <button class="btn btn-secondary" id="btnCancelSet">Annuler</button>
+        </div>
+    </div>
+    
     <!-- Share Modal -->
     <div id="modalShare" class="modal">
         <div class="modal-content">
@@ -1359,12 +1412,16 @@
         function showModal(modalId) {
             document.getElementById(modalId).classList.add('active');
             
-            // Auto-focus sur l'input du modal d'ajout d'exercice
-            if (modalId === 'modalAddLibrary') {
-                setTimeout(() => {
+            // Auto-focus
+            setTimeout(() => {
+                if (modalId === 'modalAddLibrary') {
                     document.getElementById('inputLibraryName').focus();
-                }, 100);
-            }
+                } else if (modalId === 'modalEditLibrary') {
+                    document.getElementById('inputEditLibraryName').focus();
+                } else if (modalId === 'modalAddSet') {
+                    document.getElementById('inputSetWeight').focus();
+                }
+            }, 100);
         }
         
         function hideModal(modalId) {
@@ -1579,6 +1636,41 @@
             }
         }
         
+        function editExercise(id) {
+            const exercise = state.exercises.find(ex => ex.id === id);
+            if (!exercise) return;
+            
+            // Store the ID being edited
+            state.editingExerciseId = id;
+            
+            // Pre-fill the form
+            document.getElementById('inputEditLibraryName').value = exercise.name;
+            document.getElementById('inputEditLibraryCategory').value = exercise.category || 'Pectoraux';
+            
+            showModal('modalEditLibrary');
+        }
+        
+        function confirmEditLibrary() {
+            const name = document.getElementById('inputEditLibraryName').value.trim();
+            const category = document.getElementById('inputEditLibraryCategory').value;
+            
+            if (!name) {
+                showToast('Entrez un nom', 'error');
+                return;
+            }
+            
+            const exercise = state.exercises.find(ex => ex.id === state.editingExerciseId);
+            if (exercise) {
+                exercise.name = name;
+                exercise.category = category;
+                
+                saveData();
+                renderLibrary();
+                hideModal('modalEditLibrary');
+                showToast('Exercice modifié !', 'success');
+            }
+        }
+        
         function renderLibrary() {
             const container = document.getElementById('exerciseLibrary');
             
@@ -1606,9 +1698,14 @@
                         ${categories[cat].map(ex => `
                             <div class="library-item">
                                 <div class="library-item-name">${ex.name}</div>
-                                <button class="btn-delete-exercise" onclick="deleteFromLibrary(${ex.id})" title="Supprimer">
-                                    ×
-                                </button>
+                                <div style="display: flex; gap: 8px;">
+                                    <button class="btn-delete-exercise" onclick="editExercise(${ex.id})" title="Modifier" style="background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); color: var(--white-pure);">
+                                        ✎
+                                    </button>
+                                    <button class="btn-delete-exercise" onclick="deleteFromLibrary(${ex.id})" title="Supprimer">
+                                        ×
+                                    </button>
+                                </div>
                             </div>
                         `).join('')}
                     </div>`;
@@ -1632,8 +1729,12 @@
             state.currentSession = {
                 startTime: Date.now(),
                 exercises: [],
-                totalReps: 0
+                totalReps: 0,
+                totalVolume: 0
             };
+            
+            // Initialize volume display
+            document.getElementById('sessionVolume').textContent = '0 kg';
             
             sessionTimerInterval = setInterval(() => {
                 const elapsed = Math.floor((Date.now() - state.currentSession.startTime) / 1000);
@@ -1709,11 +1810,13 @@
                 finishExercise();
             }
             
-            // Create new exercise
+            // Create new exercise with sets structure
             state.currentExercise = {
                 name: state.selectedExercise.name,
                 weight: weight,
                 reps: 0,
+                sets: [],  // Array of {weight, reps, volume}
+                totalVolume: 0,
                 velocities: [],
                 startTime: Date.now(),
                 endTime: null
@@ -1761,10 +1864,87 @@
             state.currentSession.exercises.push(state.currentExercise);
             state.currentSession.totalReps += state.currentExercise.reps;
             
+            // Update session total volume
+            updateSessionVolume();
+            
             renderExerciseList();
             state.currentExercise = null;
             document.getElementById('currentExerciseContainer').classList.add('hidden');
             showToast('Exercice terminé !', 'success');
+        }
+        
+        // Add Set
+        function openAddSetModal() {
+            if (!state.currentExercise) return;
+            
+            // Pre-fill with current reps if available
+            document.getElementById('inputSetReps').value = state.currentExercise.reps || '';
+            document.getElementById('inputSetWeight').value = state.currentExercise.weight || '';
+            
+            showModal('modalAddSet');
+        }
+        
+        function confirmAddSet() {
+            const weight = parseFloat(document.getElementById('inputSetWeight').value);
+            const reps = parseInt(document.getElementById('inputSetReps').value);
+            
+            if (!weight || weight <= 0 || !reps || reps <= 0) {
+                showToast('Valeurs invalides', 'error');
+                return;
+            }
+            
+            const volume = weight * reps;
+            
+            state.currentExercise.sets.push({
+                weight: weight,
+                reps: reps,
+                volume: volume
+            });
+            
+            // Update exercise total volume
+            state.currentExercise.totalVolume = state.currentExercise.sets.reduce((sum, set) => sum + set.volume, 0);
+            
+            // Update session total volume
+            updateSessionVolume();
+            
+            // Reset current reps for next set
+            state.currentExercise.reps = 0;
+            document.getElementById('currentReps').textContent = '0';
+            
+            hideModal('modalAddSet');
+            document.getElementById('inputSetWeight').value = '';
+            document.getElementById('inputSetReps').value = '';
+            
+            showToast(`Série ajoutée : ${weight}kg × ${reps}`, 'success');
+            renderExerciseList();
+        }
+        
+        function updateSessionVolume() {
+            if (!state.currentSession) return;
+            
+            let totalVolume = 0;
+            
+            // Sum volumes from finished exercises
+            state.currentSession.exercises.forEach(ex => {
+                if (ex.sets && ex.sets.length > 0) {
+                    totalVolume += ex.sets.reduce((sum, set) => sum + set.volume, 0);
+                } else if (ex.totalVolume) {
+                    totalVolume += ex.totalVolume;
+                }
+            });
+            
+            // Add current exercise volume
+            if (state.currentExercise && state.currentExercise.totalVolume) {
+                totalVolume += state.currentExercise.totalVolume;
+            }
+            
+            state.currentSession.totalVolume = totalVolume;
+            
+            // Update UI if element exists
+            const volumeEl = document.getElementById('sessionVolume');
+            if (volumeEl) {
+                volumeEl.textContent = `${totalVolume.toFixed(0)} kg`;
+            }
         }
         
         function renderExerciseList() {
@@ -1779,16 +1959,26 @@
                 <div class="exercise-card">
                     <div class="exercise-header">
                         <div class="exercise-name">${ex.name}</div>
-                        <div style="color: var(--text-secondary);">${ex.weight} kg</div>
+                        <div style="color: var(--white-secondary);">${ex.sets ? ex.sets.length : 0} série${ex.sets && ex.sets.length > 1 ? 's' : ''}</div>
                     </div>
+                    ${ex.sets && ex.sets.length > 0 ? `
+                        <div style="margin: var(--space-sm) 0;">
+                            ${ex.sets.map((set, i) => `
+                                <div style="display: flex; justify-content: space-between; padding: 4px 0; font-size: 14px; color: var(--white-secondary);">
+                                    <span>Série ${i + 1}</span>
+                                    <span>${set.weight}kg × ${set.reps} = ${set.volume}kg</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : ''}
                     <div class="exercise-stats">
                         <div class="exercise-stat">
-                            <div class="exercise-stat-label">Reps</div>
-                            <div class="exercise-stat-value">${ex.reps}</div>
+                            <div class="exercise-stat-label">Volume</div>
+                            <div class="exercise-stat-value">${ex.totalVolume || 0} kg</div>
                         </div>
                         <div class="exercise-stat">
-                            <div class="exercise-stat-label">Vitesse</div>
-                            <div class="exercise-stat-value">${ex.avgVelocity.toFixed(2)}</div>
+                            <div class="exercise-stat-label">Reps Total</div>
+                            <div class="exercise-stat-value">${ex.sets ? ex.sets.reduce((sum, set) => sum + set.reps, 0) : ex.reps}</div>
                         </div>
                         <div class="exercise-stat">
                             <div class="exercise-stat-label">Durée</div>
@@ -1816,6 +2006,7 @@
                 date: state.currentSession.startTime,
                 exercises: state.currentSession.exercises,
                 totalReps: state.currentSession.totalReps,
+                totalVolume: state.currentSession.totalVolume || 0,
                 duration: state.currentSession.duration
             });
             
@@ -2341,10 +2532,33 @@
         document.getElementById('btnConfirmLibrary').addEventListener('click', confirmAddLibrary);
         document.getElementById('btnCancelLibrary').addEventListener('click', () => hideModal('modalAddLibrary'));
         
+        // Edit Library
+        document.getElementById('btnConfirmEditLibrary').addEventListener('click', confirmEditLibrary);
+        document.getElementById('btnCancelEditLibrary').addEventListener('click', () => hideModal('modalEditLibrary'));
+        
+        // Add Set
+        document.getElementById('btnAddSet').addEventListener('click', openAddSetModal);
+        document.getElementById('btnConfirmSet').addEventListener('click', confirmAddSet);
+        document.getElementById('btnCancelSet').addEventListener('click', () => hideModal('modalAddSet'));
+        
         // Enter key validation for library input
         document.getElementById('inputLibraryName').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 confirmAddLibrary();
+            }
+        });
+        
+        // Enter key validation for edit library input
+        document.getElementById('inputEditLibraryName').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                confirmEditLibrary();
+            }
+        });
+        
+        // Enter key validation for set inputs
+        document.getElementById('inputSetReps').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                confirmAddSet();
             }
         });
         
